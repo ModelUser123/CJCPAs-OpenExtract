@@ -7,63 +7,63 @@ B,is_final_return,Final Return/Report,True
 B,is_amended_return,Amended Return/Report,True
 B,is_short_plan_year,Short Plan Year,True
 C,filing_extension,Filing Extension Type,Form 5558
-D,collectively_bargained,Collectively-Bargained Plan,False
-E,secure_act_retroactive,SECURE Act Section 201 Retroactive Plan,False
-1a,plan_name,Name of Plan,ABCDEFGHI ABCDEFGHI ABCDEFGHI ABCDEFGHI ABCDEFGHI 1b Three-digit plan number
-1b,plan_number,Three-Digit Plan Number (PN),
-1c,effective_date,Effective Date of Plan,
+D,collectively_bargained,Collectively-Bargained Plan,
+E,secure_act_retroactive,SECURE Act Section 201 Retroactive Plan,
+1a,plan_name,Name of Plan,003 LLC 401(k) RETIREMENT SAVINGS PLAN
+1b,plan_number,Three-Digit Plan Number (PN),001
+1c,effective_date,Effective Date of Plan,01/01/2019
 2a,sponsor_name,Plan Sponsor Name,
-2b,ein,Sponsor EIN,01-2345678
-2c,sponsor_phone,Sponsor Telephone Number,
-2d,business_code,Business Code (NAICS),561300
+2b,ein,Sponsor EIN,45-2990868
+2c,sponsor_phone,Sponsor Telephone Number,206-335-7183
+2d,business_code,Business Code (NAICS),
 2a,sponsor_address,Sponsor Street Address,
-2a,sponsor_city,Sponsor City,ABCDEFG
-2a,sponsor_state,Sponsor State,HI
-2a,sponsor_zip,Sponsor ZIP Code,12345
+2a,sponsor_city,Sponsor City,SEATTLE
+2a,sponsor_state,Sponsor State,WA
+2a,sponsor_zip,Sponsor ZIP Code,98109
 3a,admin_same_as_sponsor,Administrator Same as Sponsor,True
-3b,admin_ein,Administrator EIN,01-2345678
+3b,admin_ein,Administrator EIN,
 3c,admin_phone,Administrator Telephone Number,
 4a,prior_sponsor_name,Prior Sponsor Name (if changed),
 4b,prior_ein,Prior EIN (if changed),
 4c,prior_plan_name,Prior Plan Name (if changed),
 4d,prior_plan_number,Prior Plan Number (if changed),
-5a,total_participants_boy,Total Participants at Beginning of Year,738
-5b,total_participants_eoy,Total Participants at End of Year,748
-5c(1),participants_with_balances_boy,Participants with Account Balances (BOY),70
-5c(2),participants_with_balances_eoy,Participants with Account Balances (EOY),77
-5d(1),active_participants_boy,Active Participants (BOY),33
-5d(2),active_participants_eoy,Active Participants (EOY),48
-5e,terminated_unvested,Terminated Participants (<100% Vested),12
-6a,eligible_assets,All Assets in Eligible Assets,Yes
-6b,iqpa_waiver,Claiming IQPA Waiver,Yes
+5a,total_participants_boy,Total Participants at Beginning of Year,73
+5b,total_participants_eoy,Total Participants at End of Year,94
+5c(1),participants_with_balances_boy,Participants with Account Balances (BOY),
+5c(2),participants_with_balances_eoy,Participants with Account Balances (EOY),
+5d(1),active_participants_boy,Active Participants (BOY),
+5d(2),active_participants_eoy,Active Participants (EOY),
+5e,terminated_unvested,Terminated Participants (<100% Vested),
+6a,eligible_assets,All Assets in Eligible Assets,
+6b,iqpa_waiver,Claiming IQPA Waiver,
 6c,pbgc_covered,PBGC Coverage,
 6c,pbgc_confirmation_number,My PAA Confirmation Number,
-7a(a),total_assets_boy,Total Plan Assets (Beginning of Year),"$19,004,132"
-7a(b),total_plan_assets_eoy,Total Plan Assets (End of Year),"$15,369,716"
-7b(a),total_liabilities_boy,Total Plan Liabilities (Beginning of Year),"$12,345"
+7a(a),total_assets_boy,Total Plan Assets (Beginning of Year),
+7a(b),total_plan_assets_eoy,Total Plan Assets (End of Year),
+7b(a),total_liabilities_boy,Total Plan Liabilities (Beginning of Year),
 7b(b),total_liabilities_eoy,Total Plan Liabilities (End of Year),
-7c(a),net_assets_boy,Net Plan Assets (Beginning of Year),"$19,004,132"
-7c(b),net_assets_eoy,Net Plan Assets (End of Year),"$15,369,716"
-8a(1),employer_contributions,Employer Contributions,"$10,618,329"
-8a(2),participant_contributions,Participant Contributions,"$20,316,222"
-8a(3),other_contributions,Other Contributions (Rollovers),"$123,045"
-8b,other_income,Other Income (Loss),"$10,314,522"
-8c,total_contributions,Total Income,"$55,637,918"
-8d,benefit_payments,Benefits Paid,"$10,712,620"
-8e,deemed_distributions,Deemed/Corrective Distributions,"$123,045"
-8f,admin_expenses,Administrative Expenses,"$1,811,233"
-8g,other_expenses,Other Expenses,"$12,345"
-8h,total_expenses,Total Expenses,"$51,697,078"
-8i,net_income,Net Income (Loss),"$53,647,848"
-8j,transfers,Transfers To/From Plan,"$123,045"
-9a,pension_feature_codes,Pension Feature Codes,"2E, 2F, 2G, 2J, 2K, 3D"
+7c(a),net_assets_boy,Net Plan Assets (Beginning of Year),"$1,043,237"
+7c(b),net_assets_eoy,Net Plan Assets (End of Year),"$1,391,639"
+8a(1),employer_contributions,Employer Contributions,"$168,399"
+8a(2),participant_contributions,Participant Contributions,"$236,223"
+8a(3),other_contributions,Other Contributions (Rollovers),$0
+8b,other_income,Other Income (Loss),"$134,522"
+8c,total_contributions,Total Income,"$539,144"
+8d,benefit_payments,Benefits Paid,"$172,609"
+8e,deemed_distributions,Deemed/Corrective Distributions,$0
+8f,admin_expenses,Administrative Expenses,"$18,133"
+8g,other_expenses,Other Expenses,
+8h,total_expenses,Total Expenses,"$190,742"
+8i,net_income,Net Income (Loss),"$348,402"
+8j,transfers,Transfers To/From Plan,
+9a,pension_feature_codes,Pension Feature Codes,"2E, 2F, 2G, 2K, 3D"
 9b,welfare_feature_codes,Welfare Feature Codes,
 10a,failed_contribution_transmittal,Failed Participant Contribution Transmittals,No
 10a,failed_contribution_amount,Failed Contribution Amount,
 10b,nonexempt_party_transactions,Nonexempt Party-in-Interest Transactions,No
 10b,nonexempt_transaction_amount,Nonexempt Transaction Amount,
 10c,fidelity_bond_coverage,Covered by Fidelity Bond,Yes
-10c,fidelity_bond_amount,Fidelity Bond Amount,"$58,090,000"
+10c,fidelity_bond_amount,Fidelity Bond Amount,$0
 10d,loss_from_fraud,Loss from Fraud/Dishonesty,No
 10d,loss_from_fraud_amount,Fraud Loss Amount,
 10e,insurance_broker_fees,Insurance Broker Fees Paid,No
@@ -73,7 +73,7 @@ E,secure_act_retroactive,SECURE Act Section 201 Retroactive Plan,False
 10g,participant_loan_amount,Participant Loan Amount (Year-End),
 10h,blackout_period,Blackout Period Occurred,No
 10i,blackout_notice_provided,Blackout Notice Provided,
--,admin_signature_date,Administrator Signature Date,12/31/2024
--,admin_signer_name,Administrator Signer Name,A T
+-,admin_signature_date,Administrator Signature Date,
+-,admin_signer_name,Administrator Signer Name,
 -,sponsor_signature_date,Sponsor Signature Date,
 -,sponsor_signer_name,Sponsor Signer Name,
