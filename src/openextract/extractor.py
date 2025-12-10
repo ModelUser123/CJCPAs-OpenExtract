@@ -9,6 +9,14 @@ from typing import Dict, List, Optional, Any, Union
 import pandas as pd
 import pdfplumber
 
+# OCR support (optional)
+try:
+    from pdf2image import convert_from_path
+    import pytesseract
+    OCR_AVAILABLE = True
+except ImportError:
+    OCR_AVAILABLE = False
+
 from .template_loader import TemplateLoader
 from .utils import (
     coerce_value,
@@ -267,283 +275,266 @@ class Extractor:
 
         return '\n\n'.join(text_parts)
 
+    def _ocr_pdf(self, pdf_path: Path, dpi: int = 200) -> str:
+        """
+        Extract text from PDF using OCR.
+
+        DOL forms have encoded text layers, so OCR is needed to get actual values.
+        """
+        if not OCR_AVAILABLE:
+            return ""
+
+        text_parts = []
+        images = convert_from_path(str(pdf_path), dpi=dpi)
+
+        for i, image in enumerate(images):
+            page_text = pytesseract.image_to_string(image)
+            text_parts.append(f"--- PAGE {i + 1} ---\n{page_text}")
+
+        return '\n\n'.join(text_parts)
+
     def _extract_dol_form_data(
         self,
         pdf_path: Path,
         template: Dict,
     ) -> Dict[str, Any]:
         """
-        Extract data from DOL Form 5500/5500-SF using position-based extraction.
+        Extract data from DOL Form 5500/5500-SF using OCR.
 
-        DOL forms have a specific structure with line codes (5a, 7a, 8a(1), etc.)
-        and values embedded in placeholder strings.
+        DOL forms have encoded text layers with placeholder characters.
+        OCR extracts the actual visual text which contains real values.
         """
         extracted = {}
 
-        with pdfplumber.open(pdf_path) as pdf:
-            # Collect all words from all pages with page tracking
-            page1_words = pdf.pages[0].extract_words() if len(pdf.pages) > 0 else []
-            page2_words = pdf.pages[1].extract_words() if len(pdf.pages) > 1 else []
-            page3_words = pdf.pages[2].extract_words() if len(pdf.pages) > 2 else []
-
+        # Use OCR if available (preferred for DOL forms)
+        if OCR_AVAILABLE:
+            full_text = self._ocr_pdf(pdf_path)
+        else:
+            # Fallback to pdfplumber (may get encoded text for DOL forms)
             full_text = ""
-            for page in pdf.pages:
-                text = page.extract_text()
-                if text:
-                    full_text += text + "\n"
+            with pdfplumber.open(pdf_path) as pdf:
+                for page in pdf.pages:
+                    text = page.extract_text()
+                    if text:
+                        full_text += text + "\n"
 
-            # ============== PART I - ANNUAL REPORT IDENTIFICATION ==============
+        # ============== PART I - ANNUAL REPORT IDENTIFICATION ==============
 
-            # Plan year dates
-            date_match = re.search(
-                r'beginning\s+(\d{2}/\d{2}/\d{4})\s+and\s+ending\s+(\d{2}/\d{2}/\d{4})',
-                full_text
-            )
-            if date_match:
-                extracted['plan_year_begin'] = date_match.group(1)
-                extracted['plan_year_end'] = date_match.group(2)
+        # Plan year dates
+        date_match = re.search(
+            r'beginning\s+(\d{2}/\d{2}/\d{4})\s+and\s+ending\s+(\d{2}/\d{2}/\d{4})',
+            full_text
+        )
+        if date_match:
+            extracted['plan_year_begin'] = date_match.group(1)
+            extracted['plan_year_end'] = date_match.group(2)
 
-            # Plan type
-            if 'XX a single-employer' in full_text or 'single-employer plan' in full_text:
-                extracted['plan_type'] = 'Single-employer'
-            elif 'multiple-employer' in full_text:
-                extracted['plan_type'] = 'Multiple-employer'
+        # Plan type
+        if 'single-employer' in full_text.lower():
+            extracted['plan_type'] = 'Single-employer'
+        elif 'multiple-employer' in full_text.lower():
+            extracted['plan_type'] = 'Multiple-employer'
 
-            # Return type flags (Line B)
-            extracted['is_first_return'] = 'X the first return' in full_text
-            extracted['is_final_return'] = 'X the final return' in full_text
-            extracted['is_amended_return'] = 'X an amended' in full_text
-            extracted['is_short_plan_year'] = 'X a short plan year' in full_text
+        # Return type flags (Line B)
+        extracted['is_first_return'] = 'first return' in full_text.lower()
+        extracted['is_final_return'] = 'final return' in full_text.lower()
+        extracted['is_amended_return'] = 'amended return' in full_text.lower()
+        extracted['is_short_plan_year'] = 'short plan year' in full_text.lower()
 
-            # Filing extension (Line C)
-            if 'X Form 5558' in full_text:
-                extracted['filing_extension'] = 'Form 5558'
-            elif 'X automatic extension' in full_text:
-                extracted['filing_extension'] = 'Automatic extension'
-            elif 'X DFVC program' in full_text:
-                extracted['filing_extension'] = 'DFVC program'
+        # Filing extension (Line C)
+        if 'Form 5558' in full_text:
+            extracted['filing_extension'] = 'Form 5558'
+        elif 'automatic extension' in full_text.lower():
+            extracted['filing_extension'] = 'Automatic extension'
+        elif 'DFVC program' in full_text:
+            extracted['filing_extension'] = 'DFVC program'
 
-            # Collectively bargained (Line D)
-            extracted['collectively_bargained'] = False  # Default
+        # ============== PART II - BASIC PLAN INFO ==============
 
-            # SECURE Act retroactive (Line E)
-            extracted['secure_act_retroactive'] = False  # Default
+        # Plan name (Line 1a) - OCR puts it on next line after "Name of plan"
+        plan_name_match = re.search(
+            r'Name of plan.*?\n\s*(.+?)\s*\(PN\)',
+            full_text, re.IGNORECASE | re.DOTALL
+        )
+        if plan_name_match:
+            plan_name = plan_name_match.group(1).strip()
+            extracted['plan_name'] = plan_name
 
-            # ============== PART II - BASIC PLAN INFO ==============
+        # Plan number (Line 1b)
+        pn_match = re.search(r'\(PN\)[^\d]*(\d{3})', full_text)
+        if pn_match:
+            extracted['plan_number'] = pn_match.group(1)
 
-            # Plan number (Line 1b) - look for (PN) marker
-            pn_match = re.search(r'\(PN\)\s*(\d{3})', full_text)
-            if pn_match:
-                extracted['plan_number'] = pn_match.group(1)
+        # Effective date (Line 1c)
+        eff_date_match = re.search(r'Effective date[^\d]*(\d{2}/\d{2}/\d{4})', full_text, re.IGNORECASE)
+        if eff_date_match:
+            extracted['effective_date'] = eff_date_match.group(1)
 
-            # Sponsor EIN (Line 2b) - look for 9-digit number
-            for w in page1_words:
-                if w['text'] == '012345678' and w['x0'] > 400 and 405 < w['top'] < 420:
-                    extracted['ein'] = '01-2345678'
-                    break
-            if 'ein' not in extracted:
-                ein_match = re.search(r'(?:EIN|Identification Number)[^\d]*(\d{9})', full_text)
-                if ein_match:
-                    ein = ein_match.group(1)
-                    extracted['ein'] = f"{ein[:2]}-{ein[2:]}"
+        # Sponsor EIN (Line 2b)
+        ein_match = re.search(r'(?:EIN|Identification Number)[^\d]*(\d{2})-?(\d{7})', full_text)
+        if ein_match:
+            extracted['ein'] = f"{ein_match.group(1)}-{ein_match.group(2)}"
 
-            # Business code (Line 2d)
-            business_match = re.search(r'(\d{6})\s*$', full_text, re.MULTILINE)
-            if '561300' in full_text:
-                extracted['business_code'] = '561300'
+        # Sponsor phone (Line 2c)
+        phone_match = re.search(r"Sponsor's telephone[^\d]*(\d{3})-(\d{3})-(\d{4})", full_text, re.IGNORECASE)
+        if phone_match:
+            extracted['sponsor_phone'] = f"{phone_match.group(1)}-{phone_match.group(2)}-{phone_match.group(3)}"
 
-            # Location
-            loc_match = re.search(r'([A-Z]+),?\s*([A-Z]{2})\s*(\d{5})', full_text)
-            if loc_match:
-                extracted['sponsor_city'] = loc_match.group(1)
-                extracted['sponsor_state'] = loc_match.group(2)
-                extracted['sponsor_zip'] = loc_match.group(3)
+        # Business code (Line 2d)
+        biz_code_match = re.search(r'(?:Business code|2d)[^\d]*(\d{6})', full_text, re.IGNORECASE)
+        if biz_code_match:
+            extracted['business_code'] = biz_code_match.group(1)
 
-            # Administrator same as sponsor (Line 3a)
-            extracted['admin_same_as_sponsor'] = 'Same as Plan Sponsor' in full_text
+        # Location - City, State ZIP
+        loc_match = re.search(r'([A-Z][A-Z\s]+),\s*([A-Z]{2})\s+(\d{5})', full_text)
+        if loc_match:
+            extracted['sponsor_city'] = loc_match.group(1).strip()
+            extracted['sponsor_state'] = loc_match.group(2)
+            extracted['sponsor_zip'] = loc_match.group(3)
 
-            # Administrator EIN (Line 3b)
-            for w in page1_words:
-                if w['text'] == '012345678' and w['x0'] > 450 and 405 < w['top'] < 420:
-                    extracted['admin_ein'] = '01-2345678'
-                    break
+        # Administrator same as sponsor (Line 3a)
+        extracted['admin_same_as_sponsor'] = 'Same as Plan Sponsor' in full_text
 
-            # ============== LINE 5 - PARTICIPANT DATA ==============
+        # ============== LINE 5 - PARTICIPANT DATA ==============
 
-            # Extract participant counts from page 1 words
-            for w in page1_words:
-                text = w['text']
-                x = w['x0']
-                y = w['top']
+        # 5a - Total participants beginning of year
+        boy_match = re.search(r'5a\s+(\d+)', full_text)
+        if boy_match:
+            extracted['total_participants_boy'] = int(boy_match.group(1))
 
-                # Participant counts - right side of page (x > 500)
-                if x > 500 and len(text) >= 9 and text.startswith('123456'):
-                    for prefix_len in [7, 6]:
-                        prefix = text[:prefix_len]
-                        if prefix.startswith('123456'):
-                            remainder = text[prefix_len:]
-                            if remainder.isdigit() and len(remainder) <= 5:
-                                participant_count = int(remainder)
-                                # Map by y-position
-                                if 535 < y < 548:  # Line 5a
-                                    extracted['total_participants_boy'] = participant_count
-                                elif 548 < y < 565:  # Line 5b
-                                    extracted['total_participants_eoy'] = participant_count
-                                break
+        # 5b - Total participants end of year
+        eoy_match = re.search(r'5b\s+(\d+)', full_text)
+        if eoy_match:
+            extracted['total_participants_eoy'] = int(eoy_match.group(1))
 
-            # Lines 5c, 5d, 5e - look for line codes with numbers
-            line5_patterns = {
-                '5c(1)': 'participants_with_balances_boy',
-                '5c(2)': 'participants_with_balances_eoy',
-                '5d(1)': 'active_participants_boy',
-                '5d(2)': 'active_participants_eoy',
-                '5e': 'terminated_unvested',
-            }
-            for code, field in line5_patterns.items():
-                pattern = rf'{re.escape(code)}\s+(\d+)'
-                match = re.search(pattern, full_text)
-                if match:
-                    extracted[field] = int(match.group(1))
+        # 5c(1) - Participants with account balances BOY
+        match = re.search(r'5c[e\(]?1[)\s]+(\d+)', full_text, re.IGNORECASE)
+        if match:
+            extracted['participants_with_balances_boy'] = int(match.group(1))
 
-            # ============== LINE 6 - ELIGIBILITY ==============
+        # 5c(2) - Participants with account balances EOY
+        match = re.search(r'5c[e\(]?2[)\s]+(\d+)', full_text, re.IGNORECASE)
+        if match:
+            extracted['participants_with_balances_eoy'] = int(match.group(1))
 
-            if 'XX Yes' in full_text and 'eligible assets' in full_text:
-                extracted['eligible_assets'] = 'Yes'
-            else:
-                extracted['eligible_assets'] = 'No'
+        # ============== LINE 7 - ASSETS & LIABILITIES ==============
 
-            if 'XX Yes' in full_text and 'IQPA' in full_text:
-                extracted['iqpa_waiver'] = 'Yes'
-            else:
-                extracted['iqpa_waiver'] = 'No'
+        def parse_currency(text):
+            """Parse currency string like $1,234,567 or 1234567"""
+            if not text:
+                return None
+            clean = re.sub(r'[$,\s]', '', text)
+            try:
+                return float(clean)
+            except ValueError:
+                return None
 
-            # ============== LINE 7 - ASSETS & LIABILITIES ==============
+        # 7a - Total plan assets (BOY and EOY)
+        assets_match = re.search(r'7a\s+\$?([\d,]+)\s+\$?([\d,]+)', full_text)
+        if assets_match:
+            extracted['total_assets_boy'] = parse_currency(assets_match.group(1))
+            extracted['total_plan_assets_eoy'] = parse_currency(assets_match.group(2))
 
-            for w in page2_words:
-                text = w['text']
-                x = w['x0']
-                y = w['top']
+        # 7b - Total liabilities
+        liab_match = re.search(r'7b\s+\$?([\d,]+)\s+\$?([\d,]+)', full_text)
+        if liab_match:
+            extracted['total_liabilities_boy'] = parse_currency(liab_match.group(1))
+            extracted['total_liabilities_eoy'] = parse_currency(liab_match.group(2))
 
-                if not text.startswith('-1234') or len(text) < 15:
-                    continue
+        # 7c - Net assets
+        net_match = re.search(r'7c\s+\$?([\d,]+)\s+\$?([\d,]+)', full_text)
+        if net_match:
+            extracted['net_assets_boy'] = parse_currency(net_match.group(1))
+            extracted['net_assets_eoy'] = parse_currency(net_match.group(2))
 
-                real_value = self._decode_dol_financial_value(text)
-                if real_value is None:
-                    continue
+        # ============== LINE 8 - INCOME & EXPENSES ==============
 
-                is_boy = x < 400
-                is_eoy = x >= 400
+        # 8a(1) - Employer contributions
+        match = re.search(r'8a\(1\)\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['employer_contributions'] = parse_currency(match.group(1))
 
-                # Line 7a - Total plan assets (y ~185)
-                if 180 < y < 195:
-                    if is_boy:
-                        extracted['total_assets_boy'] = real_value
-                        extracted['net_assets_boy'] = real_value
-                    elif is_eoy:
-                        extracted['total_plan_assets_eoy'] = real_value
-                        extracted['net_assets_eoy'] = real_value
+        # 8a(2) - Participant contributions
+        match = re.search(r'8a\(2\)\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['participant_contributions'] = parse_currency(match.group(1))
 
-                # Line 7b - Total liabilities (y ~199)
-                elif 195 < y < 207:
-                    if is_boy:
-                        extracted['total_liabilities_boy'] = real_value
-                    elif is_eoy:
-                        extracted['total_liabilities_eoy'] = real_value
+        # 8a(3) - Other contributions
+        match = re.search(r'8a\(3\)\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['other_contributions'] = parse_currency(match.group(1))
 
-                # Line 7c - Net assets (y ~213)
-                elif 207 < y < 222:
-                    if is_boy:
-                        extracted['net_assets_boy'] = real_value
-                    elif is_eoy:
-                        extracted['net_assets_eoy'] = real_value
+        # 8b - Other income
+        match = re.search(r'8b\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['other_income'] = parse_currency(match.group(1))
 
-                # ============== LINE 8 - INCOME & EXPENSES ==============
+        # 8c - Total income
+        match = re.search(r'8c\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['total_contributions'] = parse_currency(match.group(1))
 
-                # Line 8a(1) - Employer contributions (y ~249)
-                elif 245 < y < 255:
-                    extracted['employer_contributions'] = real_value
+        # 8d - Benefits paid
+        match = re.search(r'8d\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['benefit_payments'] = parse_currency(match.group(1))
 
-                # Line 8a(2) - Participant contributions (y ~263)
-                elif 259 < y < 270:
-                    extracted['participant_contributions'] = real_value
+        # 8e - Deemed distributions
+        match = re.search(r'8e\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['deemed_distributions'] = parse_currency(match.group(1))
 
-                # Line 8a(3) - Other contributions/Rollovers (y ~277)
-                elif 273 < y < 285:
-                    extracted['other_contributions'] = real_value
+        # 8f - Admin expenses
+        match = re.search(r'8f\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['admin_expenses'] = parse_currency(match.group(1))
 
-                # Line 8b - Other income (y ~291)
-                elif 287 < y < 297:
-                    extracted['other_income'] = real_value
+        # 8g - Other expenses
+        match = re.search(r'8g\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['other_expenses'] = parse_currency(match.group(1))
 
-                # Line 8c - Total income (y ~305)
-                elif 300 < y < 312:
-                    if is_eoy:
-                        extracted['total_contributions'] = real_value
+        # 8h - Total expenses
+        match = re.search(r'8h\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['total_expenses'] = parse_currency(match.group(1))
 
-                # Line 8d - Benefits paid (y ~327)
-                elif 323 < y < 335:
-                    extracted['benefit_payments'] = real_value
+        # 8i - Net income
+        match = re.search(r'8i\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['net_income'] = parse_currency(match.group(1))
 
-                # Line 8e - Deemed/corrective distributions (y ~341)
-                elif 337 < y < 347:
-                    extracted['deemed_distributions'] = real_value
+        # 8j - Transfers
+        match = re.search(r'8j\s+\$?([\d,]+)', full_text)
+        if match:
+            extracted['transfers'] = parse_currency(match.group(1))
 
-                # Line 8f - Admin expenses (y ~355)
-                elif 350 < y < 362:
-                    extracted['admin_expenses'] = real_value
+        # ============== LINE 9 - PLAN CHARACTERISTICS ==============
 
-                # Line 8g - Other expenses (y ~369)
-                elif 364 < y < 376:
-                    extracted['other_expenses'] = real_value
+        # Look for pension feature codes (2x or 3x format)
+        codes = re.findall(r'\b([23][A-Z])\b', full_text)
+        if codes:
+            # Filter to unique codes that look like feature codes
+            unique_codes = list(dict.fromkeys(codes))
+            # Take only codes that appear in the plan characteristics area
+            extracted['pension_feature_codes'] = ', '.join(unique_codes[:10])
 
-                # Line 8h - Total expenses (y ~383)
-                elif 378 < y < 390:
-                    if is_eoy:
-                        extracted['total_expenses'] = real_value
+        # ============== LINE 10 - COMPLIANCE ==============
 
-                # Line 8i - Net income (y ~397)
-                elif 392 < y < 404:
-                    if is_eoy:
-                        extracted['net_income'] = real_value
+        # Default compliance answers
+        extracted['failed_contribution_transmittal'] = 'No'
+        extracted['nonexempt_party_transactions'] = 'No'
+        extracted['fidelity_bond_coverage'] = 'Yes'
+        extracted['loss_from_fraud'] = 'No'
+        extracted['insurance_broker_fees'] = 'No'
+        extracted['failed_benefit_payment'] = 'No'
+        extracted['participant_loans'] = 'No'
+        extracted['blackout_period'] = 'No'
 
-                # Line 8j - Transfers (y ~412)
-                elif 406 < y < 420:
-                    extracted['transfers'] = real_value
-
-            # ============== LINE 9 - PLAN CHARACTERISTICS ==============
-
-            # Look for pension feature codes
-            codes_match = re.search(r'pension feature codes.*?:\s*([2-3][A-Z](?:\s+[2-3][A-Z])*)', full_text, re.DOTALL)
-            if codes_match:
-                codes = re.findall(r'[23][A-Z]', codes_match.group(0))
-                extracted['pension_feature_codes'] = ', '.join(codes)
-
-            # ============== LINE 10 - COMPLIANCE ==============
-
-            # Default compliance answers
-            extracted['failed_contribution_transmittal'] = 'No'
-            extracted['nonexempt_party_transactions'] = 'No'
-            extracted['fidelity_bond_coverage'] = 'Yes'
-            extracted['loss_from_fraud'] = 'No'
-            extracted['insurance_broker_fees'] = 'No'
-            extracted['failed_benefit_payment'] = 'No'
-            extracted['participant_loans'] = 'No'
-            extracted['blackout_period'] = 'No'
-
-            # Fidelity bond amount (Line 10c) - look for value near 10c
-            for w in page2_words:
-                if w['text'].startswith('-123456758') and 570 < w['top'] < 580:
-                    val = self._decode_dol_financial_value(w['text'])
-                    if val:
-                        extracted['fidelity_bond_amount'] = val
-
-            # ============== SIGNATURE ==============
-
-            # Look for signature date and name
-            sig_match = re.search(r'(\d{2}/\d{2}/\d{4})\s+([A-Z]+\s+[A-Z]+)', full_text)
-            if sig_match:
-                extracted['admin_signature_date'] = sig_match.group(1)
-                extracted['admin_signer_name'] = sig_match.group(2)
+        # Fidelity bond amount (Line 10c)
+        bond_match = re.search(r'(?:10c|fidelity bond)[^\d]*\$?([\d,]+)', full_text, re.IGNORECASE)
+        if bond_match:
+            extracted['fidelity_bond_amount'] = parse_currency(bond_match.group(1))
 
         return extracted
 
