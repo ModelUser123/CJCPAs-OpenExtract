@@ -1,0 +1,280 @@
+{
+  "template_id": "k1-1065",
+  "template_name": "Schedule K-1 (Form 1065) - Partner's Share of Income",
+  "description": "IRS Schedule K-1 (Form 1065) for reporting a partner's share of income, deductions, credits, and other items from a partnership.",
+  "document_type": "tax-form",
+  "version": "1.0.0",
+  "author": "OpenExtract Community",
+  "tags": ["k1", "1065", "tax", "irs", "partnership", "income"],
+  "fields": [
+    {
+      "field_name": "tax_year",
+      "display_name": "Tax Year",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:For\\s+calendar\\s+year\\s+|Tax\\s+[Yy]ear\\s*)(20\\d{2})",
+      "fallback_patterns": [
+        "(20\\d{2})\\s+Schedule\\s+K-1"
+      ],
+      "section": "Form Information"
+    },
+    {
+      "field_name": "partnership_name",
+      "display_name": "Partnership Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Partnership'?s?\\s+name|Name\\s+of\\s+partnership)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "section": "Part I - Partnership Information"
+    },
+    {
+      "field_name": "partnership_ein",
+      "display_name": "Partnership EIN",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Partnership'?s?\\s+(?:employer\\s+)?(?:identification|ID)\\s+(?:number|no\\.?)|EIN)[:\\s]*(\\d{2}[- ]?\\d{7})",
+      "validation": "^\\d{2}-?\\d{7}$",
+      "section": "Part I - Partnership Information"
+    },
+    {
+      "field_name": "partnership_address",
+      "display_name": "Partnership Address",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Partnership'?s?\\s+address)[:\\s]+([A-Za-z0-9\\s\\-\\.,#]+)",
+      "section": "Part I - Partnership Information"
+    },
+    {
+      "field_name": "partner_name",
+      "display_name": "Partner's Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Partner'?s?\\s+name|Name\\s+of\\s+partner)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "section": "Part II - Partner Information"
+    },
+    {
+      "field_name": "partner_tin",
+      "display_name": "Partner's TIN",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Partner'?s?\\s+(?:identifying|identification|ID|SSN)\\s+(?:number|no\\.?))[:\\s]*(\\d{2}[- ]?\\d{7}|\\d{3}[- ]?\\d{2}[- ]?\\d{4})",
+      "section": "Part II - Partner Information"
+    },
+    {
+      "field_name": "partner_type",
+      "display_name": "Partner Type",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:General\\s+partner|Limited\\s+partner|LLC\\s+member)",
+      "section": "Part II - Partner Information"
+    },
+    {
+      "field_name": "profit_sharing_percentage_boy",
+      "display_name": "Profit Sharing % - Beginning of Year",
+      "data_type": "percentage",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Profit\\s+sharing)[:\\s]*([\\d.]+)\\s*%",
+      "section": "Part II - Partner Information"
+    },
+    {
+      "field_name": "profit_sharing_percentage_eoy",
+      "display_name": "Profit Sharing % - End of Year",
+      "data_type": "percentage",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Profit\\s+sharing\\s+end)[:\\s]*([\\d.]+)\\s*%",
+      "section": "Part II - Partner Information"
+    },
+    {
+      "field_name": "capital_percentage_boy",
+      "display_name": "Capital % - Beginning of Year",
+      "data_type": "percentage",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Capital)[:\\s]*([\\d.]+)\\s*%",
+      "section": "Part II - Partner Information"
+    },
+    {
+      "field_name": "capital_percentage_eoy",
+      "display_name": "Capital % - End of Year",
+      "data_type": "percentage",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Capital\\s+end)[:\\s]*([\\d.]+)\\s*%",
+      "section": "Part II - Partner Information"
+    },
+    {
+      "field_name": "box_1_ordinary_income",
+      "display_name": "Box 1 - Ordinary Business Income (Loss)",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:1\\s+)?[Oo]rdinary\\s+(?:business\\s+)?income\\s*\\(?loss\\)?[:\\s]*\\$?(-?[\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_2_net_rental_income",
+      "display_name": "Box 2 - Net Rental Real Estate Income (Loss)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2\\s+)?[Nn]et\\s+rental\\s+(?:real\\s+estate\\s+)?income[:\\s]*\\$?(-?[\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_3_other_net_rental_income",
+      "display_name": "Box 3 - Other Net Rental Income (Loss)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:3\\s+)?[Oo]ther\\s+net\\s+rental\\s+income[:\\s]*\\$?(-?[\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_4_guaranteed_payments",
+      "display_name": "Box 4 - Guaranteed Payments",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:4\\s+)?[Gg]uaranteed\\s+payments[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_5_interest_income",
+      "display_name": "Box 5 - Interest Income",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:5\\s+)?[Ii]nterest\\s+income[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_6a_ordinary_dividends",
+      "display_name": "Box 6a - Ordinary Dividends",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:6a\\s+)?[Oo]rdinary\\s+dividends[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_6b_qualified_dividends",
+      "display_name": "Box 6b - Qualified Dividends",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:6b\\s+)?[Qq]ualified\\s+dividends[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_7_royalties",
+      "display_name": "Box 7 - Royalties",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:7\\s+)?[Rr]oyalties[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_8_net_short_term_gain",
+      "display_name": "Box 8 - Net Short-Term Capital Gain (Loss)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:8\\s+)?[Nn]et\\s+short[- ]term\\s+capital\\s+gain[:\\s]*\\$?(-?[\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_9a_net_long_term_gain",
+      "display_name": "Box 9a - Net Long-Term Capital Gain (Loss)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:9a\\s+)?[Nn]et\\s+long[- ]term\\s+capital\\s+gain[:\\s]*\\$?(-?[\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_10_net_1231_gain",
+      "display_name": "Box 10 - Net Section 1231 Gain (Loss)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:10\\s+)?[Nn]et\\s+(?:section\\s+)?1231\\s+gain[:\\s]*\\$?(-?[\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_14_self_employment_earnings",
+      "display_name": "Box 14 - Self-Employment Earnings (Loss)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:14\\s+)?[Ss]elf[- ]employment\\s+earnings[:\\s]*\\$?(-?[\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "box_19_distributions",
+      "display_name": "Box 19 - Distributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:19\\s+)?[Dd]istributions[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Partner's Share"
+    },
+    {
+      "field_name": "capital_account_beginning",
+      "display_name": "Capital Account - Beginning of Year",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Beginning\\s+capital\\s+account|Capital\\s+account\\s+at\\s+beginning)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part II - Partner Information"
+    },
+    {
+      "field_name": "capital_account_ending",
+      "display_name": "Capital Account - End of Year",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Ending\\s+capital\\s+account|Capital\\s+account\\s+at\\s+end)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part II - Partner Information"
+    }
+  ],
+  "output_format": {
+    "csv_headers": [
+      "tax_year",
+      "partnership_name",
+      "partnership_ein",
+      "partnership_address",
+      "partner_name",
+      "partner_tin",
+      "partner_type",
+      "profit_sharing_percentage_boy",
+      "profit_sharing_percentage_eoy",
+      "capital_percentage_boy",
+      "capital_percentage_eoy",
+      "box_1_ordinary_income",
+      "box_2_net_rental_income",
+      "box_3_other_net_rental_income",
+      "box_4_guaranteed_payments",
+      "box_5_interest_income",
+      "box_6a_ordinary_dividends",
+      "box_6b_qualified_dividends",
+      "box_7_royalties",
+      "box_8_net_short_term_gain",
+      "box_9a_net_long_term_gain",
+      "box_10_net_1231_gain",
+      "box_14_self_employment_earnings",
+      "box_19_distributions",
+      "capital_account_beginning",
+      "capital_account_ending"
+    ],
+    "date_format": "YYYY-MM-DD"
+  }
+}

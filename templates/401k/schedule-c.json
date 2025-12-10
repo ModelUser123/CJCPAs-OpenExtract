@@ -1,0 +1,116 @@
+{
+  "template_id": "schedule-c",
+  "template_name": "Form 5500 Schedule C - Service Provider Information",
+  "description": "Schedule C (Form 5500) for reporting service provider and trustee/custodian information for employee benefit plans.",
+  "document_type": "retirement-plan",
+  "version": "1.0.0",
+  "author": "OpenExtract Community",
+  "tags": ["401k", "pension", "erisa", "5500", "schedule-c", "service-provider"],
+  "fields": [
+    {
+      "field_name": "plan_name",
+      "display_name": "Plan Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Name of plan)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$)",
+      "section": "Header"
+    },
+    {
+      "field_name": "ein",
+      "display_name": "EIN",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:EIN)[:\\s]*(\\d{2}[- ]?\\d{7})",
+      "section": "Header"
+    },
+    {
+      "field_name": "plan_number",
+      "display_name": "Plan Number",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Plan\\s*(?:number|#)|PN)[:\\s]*(\\d{3})",
+      "section": "Header"
+    },
+    {
+      "field_name": "provider_name",
+      "display_name": "Service Provider Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Service\\s+provider\\s+name|Provider\\s+name)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$)",
+      "section": "Part I - Service Provider Information"
+    },
+    {
+      "field_name": "provider_ein",
+      "display_name": "Service Provider EIN",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Provider\\s+EIN)[:\\s]*(\\d{2}[- ]?\\d{7})",
+      "section": "Part I - Service Provider Information"
+    },
+    {
+      "field_name": "compensation_amount",
+      "display_name": "Compensation Amount",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Compensation|Amount\\s+paid)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part I - Service Provider Information"
+    },
+    {
+      "field_name": "service_codes",
+      "display_name": "Service Codes",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Service\\s+codes?)[:\\s]*([0-9,\\s]+)",
+      "section": "Part I - Service Provider Information"
+    },
+    {
+      "field_name": "trustee_name",
+      "display_name": "Trustee/Custodian Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Trustee|Custodian)\\s+(?:name)?[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$)",
+      "section": "Part II - Trustee/Custodian Information"
+    },
+    {
+      "field_name": "trustee_ein",
+      "display_name": "Trustee/Custodian EIN",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Trustee|Custodian)\\s+EIN[:\\s]*(\\d{2}[- ]?\\d{7})",
+      "section": "Part II - Trustee/Custodian Information"
+    },
+    {
+      "field_name": "terminated_provider_name",
+      "display_name": "Terminated Provider Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Terminated\\s+provider)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$)",
+      "section": "Part III - Terminated Service Providers"
+    }
+  ],
+  "output_format": {
+    "csv_headers": [
+      "plan_name",
+      "ein",
+      "plan_number",
+      "provider_name",
+      "provider_ein",
+      "compensation_amount",
+      "service_codes",
+      "trustee_name",
+      "trustee_ein",
+      "terminated_provider_name"
+    ],
+    "date_format": "MM/DD/YYYY"
+  }
+}

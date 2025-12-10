@@ -1,0 +1,173 @@
+{
+  "template_id": "1099-int",
+  "template_name": "Form 1099-INT - Interest Income",
+  "description": "IRS Form 1099-INT for reporting interest income from banks, brokerages, and other financial institutions.",
+  "document_type": "tax-form",
+  "version": "1.0.0",
+  "author": "OpenExtract Community",
+  "tags": ["1099", "tax", "irs", "income", "interest", "bank"],
+  "fields": [
+    {
+      "field_name": "payer_name",
+      "display_name": "Payer's Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:PAYER'?S?\\s+name|Payer)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "section": "Payer Information"
+    },
+    {
+      "field_name": "payer_tin",
+      "display_name": "Payer's TIN",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:PAYER'?S?\\s+TIN|Payer'?s?\\s+(?:federal\\s+)?(?:identification|ID)\\s+(?:number|no\\.?))[:\\s]*(\\d{2}[- ]?\\d{7})",
+      "validation": "^\\d{2}-?\\d{7}$",
+      "section": "Payer Information"
+    },
+    {
+      "field_name": "recipient_name",
+      "display_name": "Recipient's Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:RECIPIENT'?S?\\s+name|Recipient)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "section": "Recipient Information"
+    },
+    {
+      "field_name": "recipient_tin",
+      "display_name": "Recipient's TIN",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:RECIPIENT'?S?\\s+TIN|Recipient'?s?\\s+(?:identification|ID)\\s+(?:number|no\\.?))[:\\s]*(\\d{2}[- ]?\\d{7}|\\d{3}[- ]?\\d{2}[- ]?\\d{4})",
+      "section": "Recipient Information"
+    },
+    {
+      "field_name": "box_1_interest_income",
+      "display_name": "Box 1 - Interest Income",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:1\\s+)?[Ii]nterest\\s+income[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "fallback_patterns": [
+        "(?:Box\\s+1)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)"
+      ],
+      "section": "Income"
+    },
+    {
+      "field_name": "box_2_early_withdrawal_penalty",
+      "display_name": "Box 2 - Early Withdrawal Penalty",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2\\s+)?[Ee]arly\\s+withdrawal\\s+penalty[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Adjustments"
+    },
+    {
+      "field_name": "box_3_interest_on_savings_bonds",
+      "display_name": "Box 3 - Interest on U.S. Savings Bonds",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:3\\s+)?[Ii]nterest\\s+on\\s+(?:U\\.?S\\.?\\s+)?[Ss]avings\\s+[Bb]onds[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Income"
+    },
+    {
+      "field_name": "box_4_federal_tax_withheld",
+      "display_name": "Box 4 - Federal Tax Withheld",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:4\\s+)?[Ff]ederal\\s+(?:income\\s+)?tax\\s+withheld[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Withholding"
+    },
+    {
+      "field_name": "box_5_investment_expenses",
+      "display_name": "Box 5 - Investment Expenses",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:5\\s+)?[Ii]nvestment\\s+expenses[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Adjustments"
+    },
+    {
+      "field_name": "box_6_foreign_tax_paid",
+      "display_name": "Box 6 - Foreign Tax Paid",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:6\\s+)?[Ff]oreign\\s+tax\\s+paid[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Withholding"
+    },
+    {
+      "field_name": "box_8_tax_exempt_interest",
+      "display_name": "Box 8 - Tax-Exempt Interest",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:8\\s+)?[Tt]ax[- ]?exempt\\s+interest[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Income"
+    },
+    {
+      "field_name": "box_9_private_activity_bond_interest",
+      "display_name": "Box 9 - Private Activity Bond Interest",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:9\\s+)?[Ss]pecified\\s+private\\s+activity\\s+bond\\s+interest[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Income"
+    },
+    {
+      "field_name": "box_10_market_discount",
+      "display_name": "Box 10 - Market Discount",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:10\\s+)?[Mm]arket\\s+discount[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Adjustments"
+    },
+    {
+      "field_name": "box_11_bond_premium",
+      "display_name": "Box 11 - Bond Premium",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:11\\s+)?[Bb]ond\\s+premium[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Adjustments"
+    },
+    {
+      "field_name": "tax_year",
+      "display_name": "Tax Year",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Tax\\s+[Yy]ear|Form\\s+1099-INT\\s+)(20\\d{2})",
+      "fallback_patterns": [
+        "(20\\d{2})\\s+Form\\s+1099"
+      ],
+      "section": "Form Information"
+    }
+  ],
+  "output_format": {
+    "csv_headers": [
+      "payer_name",
+      "payer_tin",
+      "recipient_name",
+      "recipient_tin",
+      "box_1_interest_income",
+      "box_2_early_withdrawal_penalty",
+      "box_3_interest_on_savings_bonds",
+      "box_4_federal_tax_withheld",
+      "box_5_investment_expenses",
+      "box_6_foreign_tax_paid",
+      "box_8_tax_exempt_interest",
+      "box_9_private_activity_bond_interest",
+      "box_10_market_discount",
+      "box_11_bond_premium",
+      "tax_year"
+    ],
+    "date_format": "YYYY-MM-DD"
+  }
+}

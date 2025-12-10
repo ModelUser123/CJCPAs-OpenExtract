@@ -1,0 +1,143 @@
+{
+  "template_id": "1099-nec",
+  "template_name": "Form 1099-NEC - Nonemployee Compensation",
+  "description": "IRS Form 1099-NEC for reporting nonemployee compensation (independent contractor payments).",
+  "document_type": "tax-form",
+  "version": "1.0.0",
+  "author": "OpenExtract Community",
+  "tags": ["1099", "tax", "irs", "income", "contractor", "nec"],
+  "fields": [
+    {
+      "field_name": "payer_name",
+      "display_name": "Payer's Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:PAYER'?S?\\s+name|Payer)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "section": "Payer Information"
+    },
+    {
+      "field_name": "payer_tin",
+      "display_name": "Payer's TIN",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:PAYER'?S?\\s+TIN|Payer'?s?\\s+(?:federal\\s+)?(?:identification|ID)\\s+(?:number|no\\.?))[:\\s]*(\\d{2}[- ]?\\d{7})",
+      "validation": "^\\d{2}-?\\d{7}$",
+      "section": "Payer Information"
+    },
+    {
+      "field_name": "payer_address",
+      "display_name": "Payer's Address",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:PAYER'?S?\\s+(?:street\\s+)?address)[:\\s]+([A-Za-z0-9\\s\\-\\.,#]+)",
+      "section": "Payer Information"
+    },
+    {
+      "field_name": "recipient_name",
+      "display_name": "Recipient's Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:RECIPIENT'?S?\\s+name|Recipient)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "section": "Recipient Information"
+    },
+    {
+      "field_name": "recipient_tin",
+      "display_name": "Recipient's TIN",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:RECIPIENT'?S?\\s+TIN|Recipient'?s?\\s+(?:identification|ID)\\s+(?:number|no\\.?))[:\\s]*(\\d{2}[- ]?\\d{7}|\\d{3}[- ]?\\d{2}[- ]?\\d{4})",
+      "section": "Recipient Information"
+    },
+    {
+      "field_name": "recipient_address",
+      "display_name": "Recipient's Address",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:RECIPIENT'?S?\\s+(?:street\\s+)?address)[:\\s]+([A-Za-z0-9\\s\\-\\.,#]+)",
+      "section": "Recipient Information"
+    },
+    {
+      "field_name": "box_1_nonemployee_compensation",
+      "display_name": "Box 1 - Nonemployee Compensation",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:1\\s+)?[Nn]onemployee\\s+compensation[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "fallback_patterns": [
+        "(?:Box\\s+1)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)"
+      ],
+      "section": "Income"
+    },
+    {
+      "field_name": "box_4_federal_tax_withheld",
+      "display_name": "Box 4 - Federal Tax Withheld",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:4\\s+)?[Ff]ederal\\s+(?:income\\s+)?tax\\s+withheld[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Withholding"
+    },
+    {
+      "field_name": "box_5_state_tax_withheld",
+      "display_name": "Box 5 - State Tax Withheld",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:5\\s+)?[Ss]tate\\s+(?:income\\s+)?tax\\s+withheld[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Withholding"
+    },
+    {
+      "field_name": "box_6_state",
+      "display_name": "Box 6 - State",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:6\\s+)?[Ss]tate[:\\s]+([A-Z]{2})",
+      "section": "State Information"
+    },
+    {
+      "field_name": "box_7_state_income",
+      "display_name": "Box 7 - State Income",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:7\\s+)?[Ss]tate\\s+income[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "State Information"
+    },
+    {
+      "field_name": "tax_year",
+      "display_name": "Tax Year",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Tax\\s+[Yy]ear|Form\\s+1099-NEC\\s+)(20\\d{2})",
+      "fallback_patterns": [
+        "(20\\d{2})\\s+Form\\s+1099"
+      ],
+      "section": "Form Information"
+    }
+  ],
+  "output_format": {
+    "csv_headers": [
+      "payer_name",
+      "payer_tin",
+      "payer_address",
+      "recipient_name",
+      "recipient_tin",
+      "recipient_address",
+      "box_1_nonemployee_compensation",
+      "box_4_federal_tax_withheld",
+      "box_5_state_tax_withheld",
+      "box_6_state",
+      "box_7_state_income",
+      "tax_year"
+    ],
+    "date_format": "YYYY-MM-DD"
+  }
+}

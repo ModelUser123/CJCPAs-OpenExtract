@@ -1,0 +1,109 @@
+{
+  "_comment": "This is an annotated example template. Use this as a reference when creating new templates.",
+
+  "template_id": "example-invoice",
+  "_template_id_note": "Unique ID using lowercase letters, numbers, and hyphens only",
+
+  "template_name": "Example Invoice Template",
+  "_template_name_note": "Human-readable name shown to users",
+
+  "description": "An example template demonstrating all available field types and extraction methods",
+  "_description_note": "Detailed description helping users understand what this template extracts",
+
+  "document_type": "invoice",
+  "_document_type_note": "One of: tax-form, invoice, bank-statement, retirement-plan, financial-statement, receipt, other",
+
+  "version": "1.0.0",
+  "_version_note": "Semantic versioning (MAJOR.MINOR.PATCH)",
+
+  "author": "OpenExtract Community",
+  "_author_note": "Your name, GitHub username, or organization",
+
+  "tags": ["invoice", "example", "tutorial"],
+  "_tags_note": "Keywords to help users find this template",
+
+  "fields": [
+    {
+      "field_name": "invoice_number",
+      "_field_name_note": "Machine-readable name using snake_case",
+
+      "display_name": "Invoice Number",
+      "_display_name_note": "Human-readable label shown in output",
+
+      "data_type": "string",
+      "_data_type_note": "One of: string, integer, currency, date, boolean, decimal, percentage",
+
+      "required": true,
+      "_required_note": "If true, extraction fails when field is not found",
+
+      "extraction_method": "regex",
+      "_extraction_method_note": "One of: regex, coordinates, table, keyword_proximity",
+
+      "regex_pattern": "(?:Invoice\\s*(?:#|No\\.?|Number)?)[:\\s]*(\\w+[-\\w]*)",
+      "_regex_pattern_note": "Primary regex pattern. Use capturing group () for the value to extract",
+
+      "fallback_patterns": [
+        "INV[- ]?(\\d+)",
+        "#(\\d{4,})"
+      ],
+      "_fallback_patterns_note": "Alternative patterns tried in order if primary fails",
+
+      "validation": "^[A-Z0-9-]+$",
+      "_validation_note": "Optional regex to validate the extracted value",
+
+      "section": "Header",
+      "_section_note": "Document section where field is located (for documentation)"
+    },
+    {
+      "field_name": "total_amount",
+      "display_name": "Total Amount",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Total|Amount\\s+Due|Grand\\s+Total)[:\\s]*\\$?([\\d,]+\\.\\d{2})",
+      "_currency_note": "For currency fields, the regex should capture the numeric value. $ signs are handled automatically."
+    },
+    {
+      "field_name": "invoice_date",
+      "display_name": "Invoice Date",
+      "data_type": "date",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Date|Invoice\\s+Date)[:\\s]*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})",
+      "_date_note": "Date fields are automatically parsed and formatted according to output_format.date_format"
+    },
+    {
+      "field_name": "vendor_name",
+      "display_name": "Vendor Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "coordinates",
+      "coordinates": {
+        "page": 1,
+        "x": 50,
+        "y": 100,
+        "width": 200,
+        "height": 30
+      },
+      "_coordinates_note": "Use coordinates when the field is always at a fixed position. Units are points (1/72 inch)."
+    },
+    {
+      "field_name": "tax_rate",
+      "display_name": "Tax Rate",
+      "data_type": "percentage",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Tax|VAT)[:\\s]*([\\d.]+)%?",
+      "default_value": 0,
+      "_default_value_note": "Value used when field is not found and required is false"
+    }
+  ],
+
+  "output_format": {
+    "csv_headers": ["invoice_number", "invoice_date", "vendor_name", "total_amount", "tax_rate"],
+    "_csv_headers_note": "Order of columns in CSV output. Must match field_name values.",
+
+    "date_format": "YYYY-MM-DD",
+    "_date_format_note": "How dates should be formatted in output. Common: YYYY-MM-DD, MM/DD/YYYY, DD/MM/YYYY"
+  }
+}
