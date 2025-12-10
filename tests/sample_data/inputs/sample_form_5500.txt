@@ -1,0 +1,43 @@
+Form 5500 Annual Return/Report of Employee Benefit Plan
+Department of Labor / Internal Revenue Service
+
+This Form is Open to Public Inspection
+
+For calendar plan year 2023 or fiscal plan year beginning 01/01/2023 and ending 12/31/2023
+
+Part I - Annual Report Identification Information
+
+1a  Name of plan: Midwest Manufacturing Company 401(k) Profit Sharing Plan
+1b  Plan number: 001
+1c  Plan sponsor's name: Midwest Manufacturing Company
+
+2a  Sponsor's name: Midwest Manufacturing Company
+2b  EIN: 36-1234567
+2c  Address: 1500 Industrial Parkway, Chicago, IL 60601
+2d  Phone: (312) 555-0199
+
+3a  Administrator's name: Midwest Manufacturing Company
+3b  Administrator's EIN: 36-1234567
+
+Part II - Basic Plan Information
+
+8a  Type of plan: Defined contribution - 401(k) Plan
+
+5   Total number of participants beginning of year: 487
+
+6   Total number of participants end of year: 512
+
+7a  Active participants: 485
+7b  Retired/Separated participants: 24
+7c  Deceased participants: 3
+
+Part III - Financial Information
+
+Total assets beginning of year: $28,620,000.00
+Total assets end of year: $31,444,000.00
+
+Total liabilities beginning of year: $15,000.00
+Total liabilities end of year: $18,000.00
+
+Net assets beginning of year: $28,605,000.00
+Net assets end of year: $31,426,000.00

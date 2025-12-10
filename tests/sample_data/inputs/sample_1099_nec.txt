@@ -1,0 +1,19 @@
+Form 1099-NEC
+Nonemployee Compensation
+Tax Year 2023
+
+PAYER'S name: ABC Consulting Services Inc
+PAYER'S TIN: 94-3456789
+PAYER'S address: 789 Business Center Drive, San Francisco, CA 94105
+
+RECIPIENT'S name: Sarah M. Williams
+RECIPIENT'S TIN: 567-89-0123
+RECIPIENT'S address: 123 Freelance Lane, Oakland, CA 94612
+
+1  Nonemployee compensation: $78,500.00
+
+4  Federal income tax withheld: $0.00
+
+5  State tax withheld: $0.00
+6  State: CA
+7  State income: $78,500.00
