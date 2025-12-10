@@ -1,0 +1,269 @@
+{
+  "template_id": "form-5500",
+  "template_name": "Form 5500 - Annual Return/Report of Employee Benefit Plan",
+  "description": "DOL/IRS Form 5500 for employee benefit plan annual reporting. Used by pension, welfare, and other ERISA-covered plans with 100+ participants.",
+  "document_type": "retirement-plan",
+  "version": "1.0.0",
+  "author": "OpenExtract Community",
+  "tags": ["401k", "pension", "erisa", "dol", "irs", "5500"],
+  "fields": [
+    {
+      "field_name": "plan_name",
+      "display_name": "Plan Name (Line 1a)",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:1a\\s+)?(?:Name of plan|Plan name)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "fallback_patterns": [
+        "(?:Plan\\s+Name)[:\\s]+(.+?)(?:\\n|$)",
+        "^([A-Z][A-Za-z0-9\\s\\-\\.,&'()]+(?:401\\(k\\)|Plan|Retirement|Savings|Profit Sharing)[A-Za-z0-9\\s\\-\\.,&'()]*)$"
+      ],
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "plan_number",
+      "display_name": "Plan Number (Line 1b)",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:1b\\s+)?(?:Plan\\s*(?:number|#)|PN)[:\\s]*(\\d{3})",
+      "fallback_patterns": [
+        "(?:Three.digit\\s+plan\\s+number)[:\\s]*(\\d{3})"
+      ],
+      "validation": "^\\d{3}$",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "plan_year_begin",
+      "display_name": "Plan Year Beginning Date (Line 1c)",
+      "data_type": "date",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Plan\\s+year\\s+beginning|Effective\\s+date)[:\\s]*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})",
+      "fallback_patterns": [
+        "(\\d{1,2}[/-]\\d{1,2}[/-]\\d{4})\\s*(?:to|through|-)\\s*\\d{1,2}[/-]\\d{1,2}[/-]\\d{4}"
+      ],
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "plan_year_end",
+      "display_name": "Plan Year Ending Date (Line 1c)",
+      "data_type": "date",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Plan\\s+year\\s+ending|and\\s+ending)[:\\s]*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})",
+      "fallback_patterns": [
+        "\\d{1,2}[/-]\\d{1,2}[/-]\\d{4}\\s*(?:to|through|-)\\s*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{4})"
+      ],
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "sponsor_name",
+      "display_name": "Plan Sponsor Name (Line 2a)",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2a\\s+)?(?:Sponsor'?s?\\s+name|Plan\\s+sponsor|Employer\\s+name)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "fallback_patterns": [
+        "(?:Name\\s+of\\s+plan\\s+sponsor)[:\\s]+(.+?)(?:\\n|$)"
+      ],
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "ein",
+      "display_name": "Employer Identification Number (Line 2b)",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2b\\s+)?(?:EIN|Employer\\s+(?:Identification|ID)\\s+(?:Number|No\\.?))[:\\s]*(\\d{2}[- ]?\\d{7})",
+      "fallback_patterns": [
+        "(\\d{2}-\\d{7})"
+      ],
+      "validation": "^\\d{2}-?\\d{7}$",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "sponsor_phone",
+      "display_name": "Sponsor Phone Number (Line 2d)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2d\\s+)?(?:Phone|Telephone)[:\\s]*\\(?([0-9]{3})\\)?[\\s.-]?([0-9]{3})[\\s.-]?([0-9]{4})",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "sponsor_address",
+      "display_name": "Sponsor Address (Lines 2c-2e)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2c\\s+)?(?:Address|Mailing\\s+address)[:\\s]+([A-Za-z0-9\\s\\-\\.,#]+(?:,\\s*[A-Za-z\\s]+,?\\s*[A-Z]{2}\\s*\\d{5}(?:-\\d{4})?))",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "administrator_name",
+      "display_name": "Administrator Name (Line 3a)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:3a\\s+)?(?:Administrator'?s?\\s+name|Plan\\s+administrator)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "administrator_ein",
+      "display_name": "Administrator EIN (Line 3b)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:3b\\s+)?(?:Administrator'?s?\\s+EIN)[:\\s]*(\\d{2}[- ]?\\d{7})",
+      "validation": "^\\d{2}-?\\d{7}$",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "plan_type",
+      "display_name": "Type of Plan (Line 8a)",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:8a\\s+)?(?:Type\\s+of\\s+plan)[:\\s]*(welfare|pension|defined\\s+benefit|defined\\s+contribution|401\\(k\\)|profit.sharing)",
+      "fallback_patterns": [
+        "(Defined\\s+(?:Benefit|Contribution))",
+        "(401\\(k\\)\\s+Plan)",
+        "(Profit[- ]?Sharing\\s+Plan)"
+      ],
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "total_participants_boy",
+      "display_name": "Total Participants - Beginning of Year (Line 5)",
+      "data_type": "integer",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:5\\s+)?(?:Total\\s+number\\s+of\\s+participants\\s+(?:at\\s+)?beginning\\s+(?:of\\s+)?(?:plan\\s+)?year|BOY\\s+participants)[:\\s]*([\\d,]+)",
+      "fallback_patterns": [
+        "(?:Beginning\\s+of\\s+year)[:\\s]*([\\d,]+)\\s*(?:participants)?"
+      ],
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "total_participants_eoy",
+      "display_name": "Total Participants - End of Year (Line 6)",
+      "data_type": "integer",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:6\\s+)?(?:Total\\s+number\\s+of\\s+participants\\s+(?:at\\s+)?end\\s+(?:of\\s+)?(?:plan\\s+)?year|EOY\\s+participants)[:\\s]*([\\d,]+)",
+      "fallback_patterns": [
+        "(?:End\\s+of\\s+year)[:\\s]*([\\d,]+)\\s*(?:participants)?"
+      ],
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "active_participants",
+      "display_name": "Active Participants (Line 7a)",
+      "data_type": "integer",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:7a\\s+)?(?:Number\\s+of\\s+)?[Aa]ctive\\s+participants[:\\s]*([\\d,]+)",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "retired_participants",
+      "display_name": "Retired/Separated Participants (Line 7b)",
+      "data_type": "integer",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:7b\\s+)?(?:Number\\s+of\\s+)?[Rr]etired(?:\\s+or)?[/\\s]+[Ss]eparated\\s+participants[:\\s]*([\\d,]+)",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "deceased_participants",
+      "display_name": "Deceased Participants (Line 7c)",
+      "data_type": "integer",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:7c\\s+)?(?:Number\\s+of\\s+)?[Dd]eceased\\s+participants[:\\s]*([\\d,]+)",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "total_assets_boy",
+      "display_name": "Total Assets - Beginning of Year (Line 1a)",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Total\\s+assets\\s+(?:at\\s+)?beginning\\s+(?:of\\s+)?(?:plan\\s+)?year|1a[.)]?\\s+Total\\s+assets)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Financial Information"
+    },
+    {
+      "field_name": "total_assets_eoy",
+      "display_name": "Total Assets - End of Year (Line 1b)",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Total\\s+assets\\s+(?:at\\s+)?end\\s+(?:of\\s+)?(?:plan\\s+)?year|1b[.)]?\\s+Total\\s+assets)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Financial Information"
+    },
+    {
+      "field_name": "total_liabilities_boy",
+      "display_name": "Total Liabilities - Beginning of Year (Line 2a)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Total\\s+liabilities\\s+(?:at\\s+)?beginning\\s+(?:of\\s+)?(?:plan\\s+)?year|2a[.)]?\\s+Total\\s+liabilities)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Financial Information"
+    },
+    {
+      "field_name": "total_liabilities_eoy",
+      "display_name": "Total Liabilities - End of Year (Line 2b)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Total\\s+liabilities\\s+(?:at\\s+)?end\\s+(?:of\\s+)?(?:plan\\s+)?year|2b[.)]?\\s+Total\\s+liabilities)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Financial Information"
+    },
+    {
+      "field_name": "net_assets_boy",
+      "display_name": "Net Assets - Beginning of Year (Line 3a)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Net\\s+assets\\s+(?:at\\s+)?beginning\\s+(?:of\\s+)?(?:plan\\s+)?year|3a[.)]?\\s+Net\\s+assets)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Financial Information"
+    },
+    {
+      "field_name": "net_assets_eoy",
+      "display_name": "Net Assets - End of Year (Line 3b)",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Net\\s+assets\\s+(?:at\\s+)?end\\s+(?:of\\s+)?(?:plan\\s+)?year|3b[.)]?\\s+Net\\s+assets)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part III - Financial Information"
+    }
+  ],
+  "output_format": {
+    "csv_headers": [
+      "plan_name",
+      "plan_number",
+      "ein",
+      "plan_year_begin",
+      "plan_year_end",
+      "sponsor_name",
+      "sponsor_address",
+      "sponsor_phone",
+      "administrator_name",
+      "administrator_ein",
+      "plan_type",
+      "total_participants_boy",
+      "total_participants_eoy",
+      "active_participants",
+      "retired_participants",
+      "deceased_participants",
+      "total_assets_boy",
+      "total_assets_eoy",
+      "total_liabilities_boy",
+      "total_liabilities_eoy",
+      "net_assets_boy",
+      "net_assets_eoy"
+    ],
+    "date_format": "MM/DD/YYYY"
+  }
+}

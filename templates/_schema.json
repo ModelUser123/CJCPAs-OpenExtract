@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OpenExtract Template Schema",
+  "description": "Schema definition for OpenExtract PDF extraction templates",
+  "type": "object",
+  "required": ["template_id", "template_name", "description", "document_type", "version", "fields", "output_format"],
+  "properties": {
+    "template_id": {
+      "type": "string",
+      "description": "Unique identifier for the template (lowercase, hyphens allowed)",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "template_name": {
+      "type": "string",
+      "description": "Human-readable name for the template"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of what this template extracts"
+    },
+    "document_type": {
+      "type": "string",
+      "description": "Category of document",
+      "enum": ["tax-form", "invoice", "bank-statement", "retirement-plan", "financial-statement", "receipt", "other"]
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of the template",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "author": {
+      "type": "string",
+      "description": "Template author or organization"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Searchable tags for the template",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fields": {
+      "type": "array",
+      "description": "List of fields to extract from the document",
+      "items": {
+        "type": "object",
+        "required": ["field_name", "display_name", "data_type", "required", "extraction_method"],
+        "properties": {
+          "field_name": {
+            "type": "string",
+            "description": "Machine-readable field name (snake_case)",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Human-readable field label"
+          },
+          "data_type": {
+            "type": "string",
+            "description": "Data type for validation and formatting",
+            "enum": ["string", "integer", "currency", "date", "boolean", "decimal", "percentage"]
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether this field must be present for successful extraction"
+          },
+          "extraction_method": {
+            "type": "string",
+            "description": "Method used to extract this field",
+            "enum": ["regex", "coordinates", "table", "keyword_proximity"]
+          },
+          "regex_pattern": {
+            "type": "string",
+            "description": "Regular expression pattern for extraction (when extraction_method is 'regex')"
+          },
+          "fallback_patterns": {
+            "type": "array",
+            "description": "Alternative regex patterns to try if primary pattern fails",
+            "items": {
+              "type": "string"
+            }
+          },
+          "coordinates": {
+            "type": "object",
+            "description": "Page coordinates for extraction (when extraction_method is 'coordinates')",
+            "properties": {
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0
+              },
+              "width": {
+                "type": "number",
+                "minimum": 1
+              },
+              "height": {
+                "type": "number",
+                "minimum": 1
+              }
+            },
+            "required": ["page", "x", "y", "width", "height"]
+          },
+          "validation": {
+            "type": "string",
+            "description": "Regex pattern to validate extracted value"
+          },
+          "section": {
+            "type": "string",
+            "description": "Document section where this field is located"
+          },
+          "default_value": {
+            "description": "Default value if field is not found and not required"
+          }
+        }
+      }
+    },
+    "output_format": {
+      "type": "object",
+      "description": "Output formatting configuration",
+      "required": ["csv_headers"],
+      "properties": {
+        "csv_headers": {
+          "type": "array",
+          "description": "Ordered list of field names for CSV output",
+          "items": {
+            "type": "string"
+          }
+        },
+        "date_format": {
+          "type": "string",
+          "description": "Date format string for output",
+          "default": "YYYY-MM-DD"
+        }
+      }
+    }
+  }
+}

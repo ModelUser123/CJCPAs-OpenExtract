@@ -1,0 +1,176 @@
+{
+  "template_id": "schedule-h",
+  "template_name": "Form 5500 Schedule H - Financial Information",
+  "description": "Schedule H (Form 5500) for reporting detailed financial information for large pension and welfare benefit plans.",
+  "document_type": "retirement-plan",
+  "version": "1.0.0",
+  "author": "OpenExtract Community",
+  "tags": ["401k", "pension", "erisa", "5500", "schedule-h", "financial"],
+  "fields": [
+    {
+      "field_name": "plan_name",
+      "display_name": "Plan Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Name of plan)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$)",
+      "section": "Header"
+    },
+    {
+      "field_name": "ein",
+      "display_name": "EIN",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:EIN)[:\\s]*(\\d{2}[- ]?\\d{7})",
+      "section": "Header"
+    },
+    {
+      "field_name": "plan_number",
+      "display_name": "Plan Number",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Plan\\s*(?:number|#)|PN)[:\\s]*(\\d{3})",
+      "section": "Header"
+    },
+    {
+      "field_name": "total_assets_boy",
+      "display_name": "Total Assets - Beginning of Year (Line 1c Col a)",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:1c\\s+)?(?:Total\\s+assets)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part I - Asset and Liability Statement"
+    },
+    {
+      "field_name": "total_assets_eoy",
+      "display_name": "Total Assets - End of Year (Line 1c Col b)",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Total\\s+assets\\s+end)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part I - Asset and Liability Statement"
+    },
+    {
+      "field_name": "total_liabilities_boy",
+      "display_name": "Total Liabilities - Beginning of Year (Line 2d Col a)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2d\\s+)?(?:Total\\s+liabilities)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part I - Asset and Liability Statement"
+    },
+    {
+      "field_name": "total_liabilities_eoy",
+      "display_name": "Total Liabilities - End of Year (Line 2d Col b)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Total\\s+liabilities\\s+end)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part I - Asset and Liability Statement"
+    },
+    {
+      "field_name": "net_assets_boy",
+      "display_name": "Net Assets - Beginning of Year (Line 3 Col a)",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:3\\s+)?(?:Net\\s+assets)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part I - Asset and Liability Statement"
+    },
+    {
+      "field_name": "net_assets_eoy",
+      "display_name": "Net Assets - End of Year (Line 3 Col b)",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Net\\s+assets\\s+end)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part I - Asset and Liability Statement"
+    },
+    {
+      "field_name": "employer_contributions",
+      "display_name": "Employer Contributions (Line 2a)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2a\\s+)?[Ee]mployer\\s+contributions[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part II - Income and Expense Statement"
+    },
+    {
+      "field_name": "participant_contributions",
+      "display_name": "Participant Contributions (Line 2b)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2b\\s+)?[Pp]articipant\\s+contributions[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part II - Income and Expense Statement"
+    },
+    {
+      "field_name": "total_contributions",
+      "display_name": "Total Contributions (Line 2e)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2e\\s+)?[Tt]otal\\s+contributions[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part II - Income and Expense Statement"
+    },
+    {
+      "field_name": "benefit_payments",
+      "display_name": "Benefit Payments (Line 2f)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2f\\s+)?[Bb]enefit\\s+(?:payments|paid)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part II - Income and Expense Statement"
+    },
+    {
+      "field_name": "total_expenses",
+      "display_name": "Total Expenses (Line 2j)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2j\\s+)?[Tt]otal\\s+expenses[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part II - Income and Expense Statement"
+    },
+    {
+      "field_name": "net_income",
+      "display_name": "Net Income (Line 3)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:3\\s+)?[Nn]et\\s+income[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Part II - Income and Expense Statement"
+    },
+    {
+      "field_name": "accountant_opinion",
+      "display_name": "Accountant Opinion Type (Line 3)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:opinion|qualified|unqualified|disclaimer|adverse)",
+      "section": "Part III - Accountant's Opinion"
+    }
+  ],
+  "output_format": {
+    "csv_headers": [
+      "plan_name",
+      "ein",
+      "plan_number",
+      "total_assets_boy",
+      "total_assets_eoy",
+      "total_liabilities_boy",
+      "total_liabilities_eoy",
+      "net_assets_boy",
+      "net_assets_eoy",
+      "employer_contributions",
+      "participant_contributions",
+      "total_contributions",
+      "benefit_payments",
+      "total_expenses",
+      "net_income",
+      "accountant_opinion"
+    ],
+    "date_format": "MM/DD/YYYY"
+  }
+}

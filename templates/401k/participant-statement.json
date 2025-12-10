@@ -1,0 +1,177 @@
+{
+  "template_id": "participant-statement",
+  "template_name": "401(k) Participant Statement",
+  "description": "Generic template for extracting data from 401(k) participant account statements, including balances, contributions, and investment allocations.",
+  "document_type": "retirement-plan",
+  "version": "1.0.0",
+  "author": "OpenExtract Community",
+  "tags": ["401k", "participant", "statement", "retirement", "account-balance"],
+  "fields": [
+    {
+      "field_name": "participant_name",
+      "display_name": "Participant Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Participant|Account\\s+holder|Name)[:\\s]+([A-Za-z\\s\\-\\.,']+?)(?:\\n|$|\\s{2,})",
+      "section": "Account Information"
+    },
+    {
+      "field_name": "participant_ssn_last4",
+      "display_name": "SSN (Last 4 digits)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:SSN|Social\\s+Security)[:\\s]*(?:XXX-XX-|\\*{5})(\\d{4})",
+      "validation": "^\\d{4}$",
+      "section": "Account Information"
+    },
+    {
+      "field_name": "plan_name",
+      "display_name": "Plan Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Plan\\s+Name|401\\(k\\)\\s+Plan)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$)",
+      "section": "Account Information"
+    },
+    {
+      "field_name": "statement_date",
+      "display_name": "Statement Date",
+      "data_type": "date",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Statement\\s+(?:Date|Period)|As\\s+of)[:\\s]*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})",
+      "section": "Account Information"
+    },
+    {
+      "field_name": "period_start_date",
+      "display_name": "Period Start Date",
+      "data_type": "date",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})\\s*(?:to|through|-)\\s*\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4}",
+      "section": "Account Information"
+    },
+    {
+      "field_name": "period_end_date",
+      "display_name": "Period End Date",
+      "data_type": "date",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4}\\s*(?:to|through|-)\\s*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})",
+      "section": "Account Information"
+    },
+    {
+      "field_name": "beginning_balance",
+      "display_name": "Beginning Balance",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Beginning|Opening|Starting)\\s+(?:Balance|Value)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Account Summary"
+    },
+    {
+      "field_name": "ending_balance",
+      "display_name": "Ending Balance",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Ending|Closing|Current|Total)\\s+(?:Balance|Value|Account\\s+Value)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Account Summary"
+    },
+    {
+      "field_name": "employee_contributions",
+      "display_name": "Employee Contributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Employee|Your|Participant)\\s+[Cc]ontributions?[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Contributions"
+    },
+    {
+      "field_name": "employer_contributions",
+      "display_name": "Employer Contributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Employer|Company|Matching)\\s+[Cc]ontributions?[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Contributions"
+    },
+    {
+      "field_name": "total_contributions",
+      "display_name": "Total Contributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Total\\s+[Cc]ontributions)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Contributions"
+    },
+    {
+      "field_name": "investment_gains",
+      "display_name": "Investment Gains/Losses",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Investment\\s+)?(?:Gains?|Losses?|Earnings?|Returns?)[:\\s]*\\$?(-?[\\d,]+(?:\\.\\d{2})?)",
+      "section": "Investment Performance"
+    },
+    {
+      "field_name": "withdrawals",
+      "display_name": "Withdrawals/Distributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Withdrawals?|Distributions?)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Distributions"
+    },
+    {
+      "field_name": "loans_outstanding",
+      "display_name": "Outstanding Loan Balance",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Loan|Outstanding)\\s+(?:Balance|Amount)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Loans"
+    },
+    {
+      "field_name": "vested_balance",
+      "display_name": "Vested Balance",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Vested\\s+(?:Balance|Amount|Value))[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Vesting"
+    },
+    {
+      "field_name": "vesting_percentage",
+      "display_name": "Vesting Percentage",
+      "data_type": "percentage",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Vesting|Vested)[:\\s]*([\\d.]+)\\s*%",
+      "section": "Vesting"
+    }
+  ],
+  "output_format": {
+    "csv_headers": [
+      "participant_name",
+      "participant_ssn_last4",
+      "plan_name",
+      "statement_date",
+      "period_start_date",
+      "period_end_date",
+      "beginning_balance",
+      "ending_balance",
+      "employee_contributions",
+      "employer_contributions",
+      "total_contributions",
+      "investment_gains",
+      "withdrawals",
+      "loans_outstanding",
+      "vested_balance",
+      "vesting_percentage"
+    ],
+    "date_format": "MM/DD/YYYY"
+  }
+}

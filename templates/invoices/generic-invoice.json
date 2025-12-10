@@ -1,0 +1,209 @@
+{
+  "template_id": "generic-invoice",
+  "template_name": "Generic Invoice",
+  "description": "Universal template for extracting common fields from invoices, bills, and similar commercial documents.",
+  "document_type": "invoice",
+  "version": "1.0.0",
+  "author": "OpenExtract Community",
+  "tags": ["invoice", "bill", "accounts-payable", "commercial"],
+  "fields": [
+    {
+      "field_name": "invoice_number",
+      "display_name": "Invoice Number",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Invoice\\s*(?:#|No\\.?|Number)?|Inv\\.?)[:\\s]*(\\w+[-\\w]*)",
+      "fallback_patterns": [
+        "(?:#|No\\.?)\\s*(INV[-\\w]+)",
+        "(?:Reference|Ref\\.?)[:\\s]*(\\w+[-\\w]*)"
+      ],
+      "section": "Header"
+    },
+    {
+      "field_name": "invoice_date",
+      "display_name": "Invoice Date",
+      "data_type": "date",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Invoice\\s+)?[Dd]ate[:\\s]*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})",
+      "fallback_patterns": [
+        "(?:Dated?)[:\\s]*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})",
+        "(\\d{1,2}[/-]\\d{1,2}[/-]\\d{4})"
+      ],
+      "section": "Header"
+    },
+    {
+      "field_name": "due_date",
+      "display_name": "Due Date",
+      "data_type": "date",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Due\\s+[Dd]ate|Payment\\s+[Dd]ue)[:\\s]*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})",
+      "section": "Header"
+    },
+    {
+      "field_name": "vendor_name",
+      "display_name": "Vendor/Seller Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:From|Vendor|Seller|Billed\\s+[Bb]y|Company)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "section": "Vendor Information"
+    },
+    {
+      "field_name": "vendor_address",
+      "display_name": "Vendor Address",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Vendor\\s+[Aa]ddress|From\\s+[Aa]ddress)[:\\s]+([A-Za-z0-9\\s\\-\\.,#]+)",
+      "section": "Vendor Information"
+    },
+    {
+      "field_name": "vendor_tax_id",
+      "display_name": "Vendor Tax ID/EIN",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Tax\\s+ID|EIN|TIN|VAT)[:\\s]*(\\d{2}[- ]?\\d{7})",
+      "section": "Vendor Information"
+    },
+    {
+      "field_name": "customer_name",
+      "display_name": "Customer/Buyer Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Bill\\s+[Tt]o|Customer|Buyer|Client|Ship\\s+[Tt]o)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
+      "section": "Customer Information"
+    },
+    {
+      "field_name": "customer_address",
+      "display_name": "Customer Address",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Customer\\s+[Aa]ddress|Bill\\s+[Tt]o\\s+[Aa]ddress)[:\\s]+([A-Za-z0-9\\s\\-\\.,#]+)",
+      "section": "Customer Information"
+    },
+    {
+      "field_name": "po_number",
+      "display_name": "Purchase Order Number",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:P\\.?O\\.?\\s*(?:#|No\\.?|Number)?|Purchase\\s+Order)[:\\s]*(\\w+[-\\w]*)",
+      "section": "Reference"
+    },
+    {
+      "field_name": "subtotal",
+      "display_name": "Subtotal",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Sub[- ]?[Tt]otal)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Totals"
+    },
+    {
+      "field_name": "tax_amount",
+      "display_name": "Tax Amount",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Tax|VAT|GST|HST|Sales\\s+[Tt]ax)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Totals"
+    },
+    {
+      "field_name": "tax_rate",
+      "display_name": "Tax Rate",
+      "data_type": "percentage",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Tax|VAT|GST)\\s*(?:Rate)?[:\\s]*([\\d.]+)\\s*%",
+      "section": "Totals"
+    },
+    {
+      "field_name": "shipping",
+      "display_name": "Shipping/Freight",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Shipping|Freight|Delivery)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Totals"
+    },
+    {
+      "field_name": "discount",
+      "display_name": "Discount",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Discount)[:\\s]*-?\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "section": "Totals"
+    },
+    {
+      "field_name": "total_amount",
+      "display_name": "Total Amount",
+      "data_type": "currency",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Total|Amount\\s+[Dd]ue|Grand\\s+[Tt]otal|Balance\\s+[Dd]ue)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+      "fallback_patterns": [
+        "(?:Total\\s+Amount)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
+        "(?:Amount\\s+Payable)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)"
+      ],
+      "section": "Totals"
+    },
+    {
+      "field_name": "currency",
+      "display_name": "Currency",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Currency)[:\\s]*(USD|EUR|GBP|CAD|AUD|[A-Z]{3})",
+      "default_value": "USD",
+      "section": "Totals"
+    },
+    {
+      "field_name": "payment_terms",
+      "display_name": "Payment Terms",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Payment\\s+[Tt]erms|Terms)[:\\s]*(Net\\s+\\d+|Due\\s+on\\s+[Rr]eceipt|COD|\\d+\\s+[Dd]ays)",
+      "section": "Payment"
+    },
+    {
+      "field_name": "payment_method",
+      "display_name": "Payment Method",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Payment\\s+[Mm]ethod|Pay\\s+[Bb]y)[:\\s]*(Check|Wire|ACH|Credit\\s+Card|Cash)",
+      "section": "Payment"
+    }
+  ],
+  "output_format": {
+    "csv_headers": [
+      "invoice_number",
+      "invoice_date",
+      "due_date",
+      "vendor_name",
+      "vendor_address",
+      "vendor_tax_id",
+      "customer_name",
+      "customer_address",
+      "po_number",
+      "subtotal",
+      "tax_amount",
+      "tax_rate",
+      "shipping",
+      "discount",
+      "total_amount",
+      "currency",
+      "payment_terms",
+      "payment_method"
+    ],
+    "date_format": "YYYY-MM-DD"
+  }
+}
