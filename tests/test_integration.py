@@ -104,6 +104,11 @@ class TestForm5500SFIntegration:
         with open(sample_path, 'r') as f:
             return f.read()
 
+    def _get_value(self, results, field_name):
+        """Helper to get value by field name from vertical format DataFrame."""
+        row = results[results['field_name'] == field_name]
+        return row['value'].iloc[0] if len(row) > 0 else None
+
     def test_form_5500_sf_extracts_plan_name(self, extractor, sample_text):
         """Test that plan name is extracted correctly."""
         with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as f:
@@ -113,7 +118,8 @@ class TestForm5500SFIntegration:
         try:
             with patch.object(extractor, '_extract_pdf_text', return_value=sample_text):
                 results = extractor.extract(pdf_path, template='form-5500-sf')
-                assert 'Johnson Family Dental' in results['plan_name'].iloc[0]
+                plan_name = self._get_value(results, 'plan_name')
+                assert plan_name is not None and 'Johnson Family Dental' in plan_name
         finally:
             os.unlink(pdf_path)
 
@@ -126,9 +132,10 @@ class TestForm5500SFIntegration:
         try:
             with patch.object(extractor, '_extract_pdf_text', return_value=sample_text):
                 results = extractor.extract(pdf_path, template='form-5500-sf')
-                assert results['employer_contributions'].iloc[0] == 42000.0
-                assert results['participant_contributions'].iloc[0] == 68500.0
-                assert results['total_contributions'].iloc[0] == 125000.0
+                # Currency values are formatted as strings in vertical format
+                assert self._get_value(results, 'employer_contributions') == '$42,000'
+                assert self._get_value(results, 'participant_contributions') == '$68,500'
+                assert self._get_value(results, 'total_contributions') == '$125,000'
         finally:
             os.unlink(pdf_path)
 
@@ -141,7 +148,8 @@ class TestForm5500SFIntegration:
         try:
             with patch.object(extractor, '_extract_pdf_text', return_value=sample_text):
                 results = extractor.extract(pdf_path, template='form-5500-sf')
-                assert results['total_plan_assets_eoy'].iloc[0] == 485000.0
+                # Currency values are formatted as strings in vertical format
+                assert self._get_value(results, 'total_plan_assets_eoy') == '$485,000'
         finally:
             os.unlink(pdf_path)
 

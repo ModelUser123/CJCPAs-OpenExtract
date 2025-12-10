@@ -277,14 +277,22 @@ class TestExtractionWithMockPDF:
             results = extractor.extract(str(pdf_path), template='form-5500-sf')
 
         assert isinstance(results, pd.DataFrame)
-        assert len(results) == 1
+        # Form 5500-SF uses vertical format with line codes (78 rows)
+        assert len(results) == 78
+        assert list(results.columns) == ['line_code', 'field_name', 'display_name', 'value']
+
+        # Helper to get value by field name from vertical format
+        def get_value(field_name):
+            row = results[results['field_name'] == field_name]
+            return row['value'].iloc[0] if len(row) > 0 else None
 
         # Check key fields were extracted
-        assert results['plan_name'].iloc[0] == 'Small Business 401(k) Plan'
-        assert results['ein'].iloc[0] == '98-7654321'
-        assert results['total_participants_eoy'].iloc[0] == 30
-        assert results['total_plan_assets_eoy'].iloc[0] == 750000.00
-        assert results['total_contributions'].iloc[0] == 140000.00
+        assert get_value('plan_name') == 'Small Business 401(k) Plan'
+        assert get_value('ein') == '98-7654321'
+        assert get_value('total_participants_eoy') == 30
+        # Currency values are formatted as strings in vertical format
+        assert get_value('total_plan_assets_eoy') == '$750,000'
+        assert get_value('total_contributions') == '$140,000'
 
     def test_validate_extraction(self, extractor, form_5500_text, tmp_path):
         """Test extraction validation."""
