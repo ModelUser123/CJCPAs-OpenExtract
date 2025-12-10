@@ -1,0 +1,25 @@
+INVOICE
+
+Invoice Number: INV-2024-0892
+Invoice Date: 03/15/2024
+Due Date: 04/14/2024
+Payment Terms: Net 30
+
+From: TechPro Solutions LLC
+Vendor address: 2500 Innovation Way, Austin, TX 78759
+Tax ID: 74-9876543
+
+Bill To: Anderson Manufacturing Corp
+Customer address: 1800 Factory Road, Houston, TX 77001
+
+PO Number: PO-2024-3847
+
+Subtotal: $16,600.00
+Tax: $1,369.50
+Tax Rate: 8.25%
+Shipping: $0.00
+
+Total: $17,969.50
+
+Payment Method: Wire Transfer
+Currency: USD

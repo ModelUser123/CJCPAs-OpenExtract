@@ -1,0 +1,37 @@
+Form 5500-SF Short Form Annual Return/Report of Small Employee Benefit Plan
+Department of Labor / Internal Revenue Service
+
+For calendar plan year 2023 or fiscal plan year beginning 01/01/2023 and ending 12/31/2023
+
+Part I - Annual Report Identification Information
+
+1a  Name of plan: Johnson Family Dental 401(k) Plan
+1b  Plan number: 001
+
+2a  Sponsor's name: Johnson Family Dental LLC
+2b  EIN: 82-9876543
+
+Part II - Basic Plan Information
+
+5   Total number of participants beginning of year: 18
+
+6   Total number of participants end of year: 22
+6a  Eligible participants: 20
+6b  Active participants with account balances: 21
+
+Part V - Financial Information
+
+8   Total plan assets: $485,000.00
+
+9a  Employer contributions: $42,000.00
+9b  Participant contributions: $68,500.00
+9c  Rollover contributions: $12,000.00
+9d  Other contributions: $2,500.00
+9e  Total contributions: $125,000.00
+
+10  Total distributions: $35,000.00
+
+11  Administrative expenses: $4,200.00
+
+Net plan assets beginning of year: $399,200.00
+Net plan assets end of year: $485,000.00

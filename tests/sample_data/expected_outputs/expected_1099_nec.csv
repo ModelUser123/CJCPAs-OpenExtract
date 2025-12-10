@@ -1,0 +1,2 @@
+payer_name,payer_tin,payer_address,recipient_name,recipient_tin,recipient_address,box_1_nonemployee_compensation,box_4_federal_tax_withheld,box_5_state_tax_withheld,box_6_state,box_7_state_income,tax_year
+ABC Consulting Services Inc,94-3456789,,Sarah M. Williams,567-89-0123,,78500.0,0.0,0.0,CA,78500.0,2023
