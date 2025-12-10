@@ -18,6 +18,61 @@ from .utils import (
 )
 
 
+def extract_dol_embedded_value(raw_value: str, value_type: str = 'currency') -> Optional[str]:
+    """
+    Extract real values from DOL form placeholder-embedded strings.
+
+    DOL forms mix placeholder text with real values, e.g.:
+    - "1234567738" contains "738" (participants)
+    - "-123456789106183293945" contains financial data
+
+    Args:
+        raw_value: The raw string from DOL PDF
+        value_type: Either 'currency', 'integer', or 'participant'
+
+    Returns:
+        Cleaned value string or None
+    """
+    if not raw_value:
+        return None
+
+    # Remove any non-digit chars except minus sign and decimal
+    clean = raw_value.strip().lstrip('-')
+
+    if value_type == 'participant':
+        # For participant counts, real value is typically last 3-4 digits
+        # after the "1234567" placeholder prefix
+        if len(clean) >= 7 and clean.startswith('123456'):
+            # Extract everything after common placeholder prefixes
+            for prefix in ['1234567', '123456']:
+                if clean.startswith(prefix):
+                    remainder = clean[len(prefix):]
+                    if remainder and remainder.isdigit():
+                        return str(int(remainder))
+        # If no placeholder pattern, return as-is
+        if clean.isdigit():
+            return str(int(clean))
+
+    elif value_type in ('currency', 'integer'):
+        # For financial values, DOL uses longer placeholders
+        # Pattern: "-123456789" followed by real digits
+        if len(clean) >= 9 and clean.startswith('123456789'):
+            remainder = clean[9:]
+            if remainder and remainder.isdigit():
+                # Real value - may need to insert decimal for currency
+                return remainder
+        # Check for shorter placeholder
+        if len(clean) >= 8 and clean.startswith('12345678'):
+            remainder = clean[8:]
+            if remainder and remainder.isdigit():
+                return remainder
+        # If it looks like a normal number, return it
+        if clean.isdigit():
+            return clean
+
+    return raw_value
+
+
 class Extractor:
     """
     Main class for extracting structured data from PDFs using templates.
@@ -126,11 +181,30 @@ class Extractor:
                 f"Available templates: {', '.join(available[:10])}..."
             )
 
-        # Extract text from PDF
-        text = self._extract_pdf_text(pdf_path, pages)
+        # Check if this is a DOL form (5500 or 5500-SF) - use specialized extraction
+        is_dol_form = template in ('form-5500', 'form-5500-sf')
 
-        # Extract fields using template
-        extracted_data = self._extract_fields(text, template_def)
+        if is_dol_form:
+            # Try DOL-specific extraction first for real DOL PDFs
+            try:
+                dol_data = self._extract_dol_form_data(pdf_path, template_def)
+            except Exception:
+                # If DOL extraction fails (e.g., invalid PDF), use empty dict
+                dol_data = {}
+
+            # Also do standard text extraction as fallback
+            text = self._extract_pdf_text(pdf_path, pages)
+            text_data = self._extract_fields(text, template_def)
+
+            # Merge: prefer DOL extraction for fields it found, use text extraction for rest
+            extracted_data = text_data.copy()
+            for key, value in dol_data.items():
+                if value is not None:
+                    extracted_data[key] = value
+        else:
+            # Standard extraction for non-DOL forms
+            text = self._extract_pdf_text(pdf_path, pages)
+            extracted_data = self._extract_fields(text, template_def)
 
         # Format output
         return self._format_output(extracted_data, template_def)
@@ -192,6 +266,215 @@ class Extractor:
                 text_parts.append(f"--- PAGE {i + 1} ---\n{page_text}")
 
         return '\n\n'.join(text_parts)
+
+    def _extract_dol_form_data(
+        self,
+        pdf_path: Path,
+        template: Dict,
+    ) -> Dict[str, Any]:
+        """
+        Extract data from DOL Form 5500/5500-SF using position-based extraction.
+
+        DOL forms have a specific structure with line codes (5a, 7a, 8a(1), etc.)
+        and values embedded in placeholder strings.
+        """
+        extracted = {}
+
+        with pdfplumber.open(pdf_path) as pdf:
+            all_words = []
+            for page in pdf.pages:
+                words = page.extract_words()
+                all_words.extend(words)
+
+            full_text = ""
+            for page in pdf.pages:
+                text = page.extract_text()
+                if text:
+                    full_text += text + "\n"
+
+            # Extract by looking for DOL line code patterns in text
+            # Plan year dates
+            date_match = re.search(
+                r'beginning\s+(\d{2}/\d{2}/\d{4})\s+and\s+ending\s+(\d{2}/\d{2}/\d{4})',
+                full_text
+            )
+            if date_match:
+                extracted['plan_year_begin'] = date_match.group(1)
+                extracted['plan_year_end'] = date_match.group(2)
+
+            # Plan number - look for (PN) marker or 001 pattern
+            pn_match = re.search(r'\(PN\)\s*(\d{3})', full_text)
+            if pn_match:
+                extracted['plan_number'] = pn_match.group(1)
+
+            # EIN - look for 9-digit number near EIN label
+            ein_match = re.search(r'(?:EIN|Identification Number)[^\d]*(\d{9})', full_text)
+            if ein_match:
+                extracted['ein'] = ein_match.group(1)
+                # Format as XX-XXXXXXX
+                ein = extracted['ein']
+                extracted['ein'] = f"{ein[:2]}-{ein[2:]}"
+
+            # Extract embedded values from specific words by position
+            for word in all_words:
+                text = word['text']
+                x = word['x0']
+                y = word['top']
+
+                # Participant counts - on page 1, right side (x > 500)
+                if x > 500 and len(text) >= 9 and text.startswith('123456'):
+                    # DOL uses various placeholder prefixes: 1234567, 1234569, etc.
+                    # Extract digits after the common '123456' prefix
+                    for prefix_len in [7, 6]:
+                        prefix = text[:prefix_len]
+                        if prefix.startswith('123456'):
+                            remainder = text[prefix_len:]
+                            if remainder.isdigit() and len(remainder) <= 5:
+                                participant_count = int(remainder)
+                                # 5a (BOY) is typically at y ~540, 5b (EOY) at y ~555
+                                if 535 < y < 548:
+                                    extracted['total_participants_boy'] = participant_count
+                                elif 548 < y < 565:
+                                    extracted['total_participants_eoy'] = participant_count
+                                break
+
+            # Extract financial data by position (page 2)
+            # DOL forms have values at specific y-positions on page 2
+            # Line 7a (Total assets): y ~185
+            # Line 8a(1) (Employer contrib): y ~249
+            # Line 8a(2) (Participant contrib): y ~263
+            # Line 8c (Total income): y ~305
+            # Line 8d (Benefits paid): y ~327
+            # Line 8f (Admin expenses): y ~355
+
+            page2_words = []
+            if len(pdf.pages) > 1:
+                page2_words = pdf.pages[1].extract_words()
+
+            for word in page2_words:
+                text = word['text']
+                x = word['x0']
+                y = word['top']
+
+                # Only process values that look like DOL placeholders
+                # DOL uses various prefixes: -123456789, -12345678, -123415369, etc.
+                if not text.startswith('-1234') or len(text) < 15:
+                    continue
+
+                # Decode the embedded value
+                real_value = self._decode_dol_financial_value(text)
+                if real_value is None:
+                    continue
+
+                # Map by y-position and x-position (x=328 is BOY, x=491 is EOY)
+                is_boy = x < 400  # Beginning of year column
+                is_eoy = x >= 400  # End of year column
+
+                # Line 7a - Total plan assets (y ~185)
+                if 180 < y < 190:
+                    if is_boy:
+                        extracted['net_plan_assets_boy'] = real_value
+                    elif is_eoy:
+                        extracted['total_plan_assets_eoy'] = real_value
+                        extracted['net_plan_assets_eoy'] = real_value
+
+                # Line 8a(1) - Employer contributions (y ~249)
+                elif 245 < y < 255:
+                    extracted['employer_contributions'] = real_value
+
+                # Line 8a(2) - Participant contributions (y ~263)
+                elif 259 < y < 270:
+                    extracted['participant_contributions'] = real_value
+
+                # Line 8a(3) - Rollovers/Other (y ~277)
+                elif 273 < y < 282:
+                    extracted['rollover_contributions'] = real_value
+                    extracted['other_contributions'] = real_value
+
+                # Line 8c - Total contributions (y ~305)
+                elif 300 < y < 310:
+                    if is_eoy:  # Total is in right column
+                        extracted['total_contributions'] = real_value
+
+                # Line 8d - Benefits paid (y ~327)
+                elif 323 < y < 332:
+                    extracted['benefit_payments'] = real_value
+
+                # Line 8f - Admin expenses (y ~355)
+                elif 350 < y < 360:
+                    extracted['admin_expenses'] = real_value
+
+            # Plan name - Due to DOL placeholder text, we can't reliably extract plan name
+            # from the garbled text. Leave it blank for user to fill in or use metadata.
+            # The form has placeholder "ABCDEFGHI" text mixed with real data
+
+        return extracted
+
+    def _decode_dol_financial_value(self, text: str) -> Optional[float]:
+        """
+        Decode financial values from DOL embedded placeholder format.
+
+        DOL forms embed real values within placeholder strings like:
+        '-1234567819004132233745' where the real value is embedded after the placeholder.
+        '-1234153697168399012345' for EOY values (different prefix pattern)
+
+        The pattern appears to be:
+        - Minus sign (optional)
+        - Placeholder prefix (varies: 123456789, 12345678, 1234567, or 1234XXXXXX)
+        - Real value embedded in remaining digits
+
+        For financial values, we look for reasonable dollar amounts embedded in the string.
+        """
+        if not text:
+            return None
+
+        # Remove leading minus sign
+        clean = text.lstrip('-')
+
+        # Strategy 1: Try standard placeholder prefixes
+        for prefix in ['123456789', '12345678', '1234567']:
+            if clean.startswith(prefix):
+                remainder = clean[len(prefix):]
+                if remainder and len(remainder) >= 5:
+                    # Try different value lengths
+                    for value_len in [8, 9, 7, 6, 10]:
+                        if len(remainder) >= value_len:
+                            value_str = remainder[:value_len]
+                            try:
+                                value = float(value_str)
+                                if 100 <= value <= 500000000:
+                                    return value
+                            except ValueError:
+                                continue
+
+        # Strategy 2: For non-standard prefixes (like EOY columns)
+        # DOL sometimes uses 1234XXXXXX where X varies
+        # Try stripping first 4-10 digits starting with 1234
+        if clean.startswith('1234') and len(clean) >= 15:
+            # Try finding a reasonable value in the string
+            # Look for 8-digit numbers that make sense as dollar amounts
+            for start_pos in range(4, 12):
+                for value_len in [8, 9, 7, 6]:
+                    if start_pos + value_len <= len(clean):
+                        value_str = clean[start_pos:start_pos + value_len]
+                        try:
+                            value = float(value_str)
+                            # More flexible range for this heuristic
+                            if 10000 <= value <= 500000000:
+                                return value
+                        except ValueError:
+                            continue
+
+        # Strategy 3: Direct conversion for normal numbers
+        try:
+            clean_num = clean.replace(',', '')
+            value = float(clean_num)
+            if 100 <= value <= 500000000:
+                return value
+        except ValueError:
+            pass
+
+        return None
 
     def _extract_fields(self, text: str, template: Dict) -> Dict[str, Any]:
         """Extract all fields from text using template definition."""
