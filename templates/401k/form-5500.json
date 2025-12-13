@@ -1,269 +1,1252 @@
 {
   "template_id": "form-5500",
   "template_name": "Form 5500 - Annual Return/Report of Employee Benefit Plan",
-  "description": "DOL/IRS Form 5500 for employee benefit plan annual reporting. Used by pension, welfare, and other ERISA-covered plans with 100+ participants.",
+  "description": "DOL/IRS Form 5500 for employee benefit plan annual reporting. Used by pension, welfare, and other ERISA-covered plans with 100+ participants. Comprehensive extraction of ~120 fields including Schedule H financial data.",
   "document_type": "retirement-plan",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "OpenExtract Community",
-  "tags": ["401k", "pension", "erisa", "dol", "irs", "5500"],
+  "tags": ["401k", "pension", "erisa", "dol", "irs", "5500", "schedule-h"],
   "fields": [
     {
-      "field_name": "plan_name",
-      "display_name": "Plan Name (Line 1a)",
-      "data_type": "string",
-      "required": true,
-      "extraction_method": "regex",
-      "regex_pattern": "(?:1a\\s+)?(?:Name of plan|Plan name)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
-      "fallback_patterns": [
-        "(?:Plan\\s+Name)[:\\s]+(.+?)(?:\\n|$)",
-        "^([A-Z][A-Za-z0-9\\s\\-\\.,&'()]+(?:401\\(k\\)|Plan|Retirement|Savings|Profit Sharing)[A-Za-z0-9\\s\\-\\.,&'()]*)$"
-      ],
-      "section": "Part I - Annual Report Identification"
-    },
-    {
-      "field_name": "plan_number",
-      "display_name": "Plan Number (Line 1b)",
-      "data_type": "string",
-      "required": true,
-      "extraction_method": "regex",
-      "regex_pattern": "(?:1b\\s+)?(?:Plan\\s*(?:number|#)|PN)[:\\s]*(\\d{3})",
-      "fallback_patterns": [
-        "(?:Three.digit\\s+plan\\s+number)[:\\s]*(\\d{3})"
-      ],
-      "validation": "^\\d{3}$",
-      "section": "Part I - Annual Report Identification"
-    },
-    {
       "field_name": "plan_year_begin",
-      "display_name": "Plan Year Beginning Date (Line 1c)",
+      "line_code": "-",
+      "display_name": "Plan Year Beginning Date",
       "data_type": "date",
       "required": true,
       "extraction_method": "regex",
-      "regex_pattern": "(?:Plan\\s+year\\s+beginning|Effective\\s+date)[:\\s]*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})",
-      "fallback_patterns": [
-        "(\\d{1,2}[/-]\\d{1,2}[/-]\\d{4})\\s*(?:to|through|-)\\s*\\d{1,2}[/-]\\d{1,2}[/-]\\d{4}"
-      ],
+      "regex_pattern": "beginning\\s+(\\d{2}/\\d{2}/\\d{4})",
       "section": "Part I - Annual Report Identification"
     },
     {
       "field_name": "plan_year_end",
-      "display_name": "Plan Year Ending Date (Line 1c)",
+      "line_code": "-",
+      "display_name": "Plan Year Ending Date",
       "data_type": "date",
       "required": true,
       "extraction_method": "regex",
-      "regex_pattern": "(?:Plan\\s+year\\s+ending|and\\s+ending)[:\\s]*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})",
-      "fallback_patterns": [
-        "\\d{1,2}[/-]\\d{1,2}[/-]\\d{4}\\s*(?:to|through|-)\\s*(\\d{1,2}[/-]\\d{1,2}[/-]\\d{4})"
-      ],
-      "section": "Part I - Annual Report Identification"
-    },
-    {
-      "field_name": "sponsor_name",
-      "display_name": "Plan Sponsor Name (Line 2a)",
-      "data_type": "string",
-      "required": true,
-      "extraction_method": "regex",
-      "regex_pattern": "(?:2a\\s+)?(?:Sponsor'?s?\\s+name|Plan\\s+sponsor|Employer\\s+name)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
-      "fallback_patterns": [
-        "(?:Name\\s+of\\s+plan\\s+sponsor)[:\\s]+(.+?)(?:\\n|$)"
-      ],
-      "section": "Part I - Annual Report Identification"
-    },
-    {
-      "field_name": "ein",
-      "display_name": "Employer Identification Number (Line 2b)",
-      "data_type": "string",
-      "required": true,
-      "extraction_method": "regex",
-      "regex_pattern": "(?:2b\\s+)?(?:EIN|Employer\\s+(?:Identification|ID)\\s+(?:Number|No\\.?))[:\\s]*(\\d{2}[- ]?\\d{7})",
-      "fallback_patterns": [
-        "(\\d{2}-\\d{7})"
-      ],
-      "validation": "^\\d{2}-?\\d{7}$",
-      "section": "Part I - Annual Report Identification"
-    },
-    {
-      "field_name": "sponsor_phone",
-      "display_name": "Sponsor Phone Number (Line 2d)",
-      "data_type": "string",
-      "required": false,
-      "extraction_method": "regex",
-      "regex_pattern": "(?:2d\\s+)?(?:Phone|Telephone)[:\\s]*\\(?([0-9]{3})\\)?[\\s.-]?([0-9]{3})[\\s.-]?([0-9]{4})",
-      "section": "Part I - Annual Report Identification"
-    },
-    {
-      "field_name": "sponsor_address",
-      "display_name": "Sponsor Address (Lines 2c-2e)",
-      "data_type": "string",
-      "required": false,
-      "extraction_method": "regex",
-      "regex_pattern": "(?:2c\\s+)?(?:Address|Mailing\\s+address)[:\\s]+([A-Za-z0-9\\s\\-\\.,#]+(?:,\\s*[A-Za-z\\s]+,?\\s*[A-Z]{2}\\s*\\d{5}(?:-\\d{4})?))",
-      "section": "Part I - Annual Report Identification"
-    },
-    {
-      "field_name": "administrator_name",
-      "display_name": "Administrator Name (Line 3a)",
-      "data_type": "string",
-      "required": false,
-      "extraction_method": "regex",
-      "regex_pattern": "(?:3a\\s+)?(?:Administrator'?s?\\s+name|Plan\\s+administrator)[:\\s]+([A-Za-z0-9\\s\\-\\.,&'()]+?)(?:\\n|$|\\s{2,})",
-      "section": "Part I - Annual Report Identification"
-    },
-    {
-      "field_name": "administrator_ein",
-      "display_name": "Administrator EIN (Line 3b)",
-      "data_type": "string",
-      "required": false,
-      "extraction_method": "regex",
-      "regex_pattern": "(?:3b\\s+)?(?:Administrator'?s?\\s+EIN)[:\\s]*(\\d{2}[- ]?\\d{7})",
-      "validation": "^\\d{2}-?\\d{7}$",
+      "regex_pattern": "ending\\s+(\\d{2}/\\d{2}/\\d{4})",
       "section": "Part I - Annual Report Identification"
     },
     {
       "field_name": "plan_type",
-      "display_name": "Type of Plan (Line 8a)",
+      "line_code": "A",
+      "display_name": "Plan Type",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "is_first_return",
+      "line_code": "B",
+      "display_name": "First Return/Report",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "is_final_return",
+      "line_code": "B",
+      "display_name": "Final Return/Report",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "is_amended_return",
+      "line_code": "B",
+      "display_name": "Amended Return/Report",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "is_short_plan_year",
+      "line_code": "B",
+      "display_name": "Short Plan Year",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "filing_extension",
+      "line_code": "C",
+      "display_name": "Filing Extension Type",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "collectively_bargained",
+      "line_code": "D",
+      "display_name": "Collectively-Bargained Plan",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "multiemployer_plan",
+      "line_code": "E",
+      "display_name": "Multiemployer Plan",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "master_trust",
+      "line_code": "F",
+      "display_name": "Part of Master Trust",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "common_collective_trust",
+      "line_code": "G",
+      "display_name": "CCT/Pooled Separate Account",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "dfe_investment",
+      "line_code": "H",
+      "display_name": "Direct Filing Entity Investment",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "secure_act_retroactive",
+      "line_code": "I",
+      "display_name": "SECURE Act Section 201 Retroactive Plan",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part I - Annual Report Identification"
+    },
+    {
+      "field_name": "plan_name",
+      "line_code": "1a",
+      "display_name": "Name of Plan",
       "data_type": "string",
       "required": true,
       "extraction_method": "regex",
-      "regex_pattern": "(?:8a\\s+)?(?:Type\\s+of\\s+plan)[:\\s]*(welfare|pension|defined\\s+benefit|defined\\s+contribution|401\\(k\\)|profit.sharing)",
-      "fallback_patterns": [
-        "(Defined\\s+(?:Benefit|Contribution))",
-        "(401\\(k\\)\\s+Plan)",
-        "(Profit[- ]?Sharing\\s+Plan)"
-      ],
+      "regex_pattern": "(?:1a\\s+)?(?:Name of plan|Plan name)[:\\s]+(.+?)(?:\\n|$)",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "plan_number",
+      "line_code": "1b",
+      "display_name": "Three-Digit Plan Number (PN)",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:1b\\s+)?(?:Plan\\s*number|PN)[:\\s]*(\\d{3})",
+      "validation": "^\\d{3}$",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "effective_date",
+      "line_code": "1c",
+      "display_name": "Effective Date of Plan",
+      "data_type": "date",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Effective date|1c)[:\\s]*(\\d{2}/\\d{2}/\\d{4})",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "sponsor_name",
+      "line_code": "2a",
+      "display_name": "Plan Sponsor Name",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2a\\s+)?(?:Sponsor'?s?\\s+name|Plan\\s+sponsor)[:\\s]+(.+?)(?:\\n|$)",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "ein",
+      "line_code": "2b",
+      "display_name": "Employer Identification Number (EIN)",
+      "data_type": "string",
+      "required": true,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2b\\s+)?(?:EIN|Employer\\s+Identification\\s+Number)[:\\s]*(\\d{2}-?\\d{7})",
+      "validation": "^\\d{2}-?\\d{7}$",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "sponsor_phone",
+      "line_code": "2c",
+      "display_name": "Sponsor Telephone Number",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:2[cd]\\s+)?(?:Phone|Telephone)[:\\s]*([0-9()\\s-]+)",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "business_code",
+      "line_code": "2d",
+      "display_name": "Business Code (NAICS)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Business code|2d)[:\\s]*(\\d{6})",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "sponsor_address",
+      "line_code": "2e",
+      "display_name": "Sponsor Street Address",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:Address|2[ce])[:\\s]+(.+?)(?:,\\s*[A-Z]{2}|\\n)",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "sponsor_city",
+      "line_code": "2e",
+      "display_name": "Sponsor City",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "sponsor_state",
+      "line_code": "2e",
+      "display_name": "Sponsor State",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "sponsor_zip",
+      "line_code": "2e",
+      "display_name": "Sponsor ZIP Code",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "sponsor_country",
+      "line_code": "2e",
+      "display_name": "Sponsor Country (if foreign)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "admin_same_as_sponsor",
+      "line_code": "3a",
+      "display_name": "Administrator Same as Sponsor",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "admin_name",
+      "line_code": "3a",
+      "display_name": "Administrator Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:3a\\s+)?(?:Administrator'?s?\\s+name)[:\\s]+(.+?)(?:\\n|$)",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "admin_ein",
+      "line_code": "3b",
+      "display_name": "Administrator EIN",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:3b\\s+)?(?:Administrator'?s?\\s+EIN)[:\\s]*(\\d{2}-?\\d{7})",
+      "validation": "^\\d{2}-?\\d{7}$",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "admin_phone",
+      "line_code": "3c",
+      "display_name": "Administrator Telephone Number",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "admin_address",
+      "line_code": "3d",
+      "display_name": "Administrator Address",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "prior_sponsor_name",
+      "line_code": "4a",
+      "display_name": "Prior Sponsor Name (if changed)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "prior_ein",
+      "line_code": "4b",
+      "display_name": "Prior EIN (if changed)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "prior_plan_name",
+      "line_code": "4c",
+      "display_name": "Prior Plan Name (if changed)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Basic Plan Information"
+    },
+    {
+      "field_name": "prior_plan_number",
+      "line_code": "4d",
+      "display_name": "Prior Plan Number (if changed)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
       "section": "Part II - Basic Plan Information"
     },
     {
       "field_name": "total_participants_boy",
-      "display_name": "Total Participants - Beginning of Year (Line 5)",
+      "line_code": "5",
+      "display_name": "Total Participants at Beginning of Year",
       "data_type": "integer",
       "required": true,
       "extraction_method": "regex",
-      "regex_pattern": "(?:5\\s+)?(?:Total\\s+number\\s+of\\s+participants\\s+(?:at\\s+)?beginning\\s+(?:of\\s+)?(?:plan\\s+)?year|BOY\\s+participants)[:\\s]*([\\d,]+)",
-      "fallback_patterns": [
-        "(?:Beginning\\s+of\\s+year)[:\\s]*([\\d,]+)\\s*(?:participants)?"
-      ],
-      "section": "Part II - Basic Plan Information"
+      "regex_pattern": "(?:5\\s+)?Total\\s+(?:number\\s+of\\s+)?participants\\s+(?:at\\s+)?beginning[^\\d]*(\\d+)",
+      "fallback_patterns": ["beginning of year[:\\s]+(\\d+)"],
+      "section": "Part II - Participant Information"
     },
     {
       "field_name": "total_participants_eoy",
-      "display_name": "Total Participants - End of Year (Line 6)",
+      "line_code": "6",
+      "display_name": "Total Participants at End of Year",
       "data_type": "integer",
       "required": true,
       "extraction_method": "regex",
-      "regex_pattern": "(?:6\\s+)?(?:Total\\s+number\\s+of\\s+participants\\s+(?:at\\s+)?end\\s+(?:of\\s+)?(?:plan\\s+)?year|EOY\\s+participants)[:\\s]*([\\d,]+)",
-      "fallback_patterns": [
-        "(?:End\\s+of\\s+year)[:\\s]*([\\d,]+)\\s*(?:participants)?"
-      ],
-      "section": "Part II - Basic Plan Information"
+      "regex_pattern": "(?:6\\s+)?Total\\s+(?:number\\s+of\\s+)?participants\\s+(?:at\\s+)?end[^\\d]*(\\d+)",
+      "fallback_patterns": ["end of year[:\\s]+(\\d+)"],
+      "section": "Part II - Participant Information"
     },
     {
       "field_name": "active_participants",
-      "display_name": "Active Participants (Line 7a)",
+      "line_code": "7a",
+      "display_name": "Active Participants",
       "data_type": "integer",
       "required": false,
       "extraction_method": "regex",
-      "regex_pattern": "(?:7a\\s+)?(?:Number\\s+of\\s+)?[Aa]ctive\\s+participants[:\\s]*([\\d,]+)",
-      "section": "Part II - Basic Plan Information"
+      "regex_pattern": "(?:7a\\s+)?Active\\s+participants[:\\s]*(\\d+)",
+      "section": "Part II - Participant Information"
     },
     {
-      "field_name": "retired_participants",
-      "display_name": "Retired/Separated Participants (Line 7b)",
+      "field_name": "retired_separated_participants",
+      "line_code": "7b",
+      "display_name": "Retired/Separated Participants Receiving Benefits",
       "data_type": "integer",
       "required": false,
       "extraction_method": "regex",
-      "regex_pattern": "(?:7b\\s+)?(?:Number\\s+of\\s+)?[Rr]etired(?:\\s+or)?[/\\s]+[Ss]eparated\\s+participants[:\\s]*([\\d,]+)",
-      "section": "Part II - Basic Plan Information"
+      "regex_pattern": "(?:7b\\s+)?Retired[/\\s]+Separated\\s+participants[:\\s]*(\\d+)",
+      "section": "Part II - Participant Information"
+    },
+    {
+      "field_name": "other_participants",
+      "line_code": "7c",
+      "display_name": "Other Participants (Separated, entitled to future benefits)",
+      "data_type": "integer",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Participant Information"
     },
     {
       "field_name": "deceased_participants",
-      "display_name": "Deceased Participants (Line 7c)",
+      "line_code": "7d",
+      "display_name": "Deceased Participants with Beneficiaries",
       "data_type": "integer",
       "required": false,
       "extraction_method": "regex",
-      "regex_pattern": "(?:7c\\s+)?(?:Number\\s+of\\s+)?[Dd]eceased\\s+participants[:\\s]*([\\d,]+)",
-      "section": "Part II - Basic Plan Information"
+      "regex_pattern": "(?:7[cd]\\s+)?Deceased\\s+participants[:\\s]*(\\d+)",
+      "section": "Part II - Participant Information"
+    },
+    {
+      "field_name": "total_all_categories",
+      "line_code": "7e",
+      "display_name": "Total All Categories (7a+7b+7c+7d)",
+      "data_type": "integer",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part II - Participant Information"
+    },
+    {
+      "field_name": "plan_type_code",
+      "line_code": "8a",
+      "display_name": "Type of Plan (Pension/Welfare)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "(?:8a\\s+)?Type\\s+of\\s+plan[:\\s]+(.+?)(?:\\n|$)",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "pension_plan_type",
+      "line_code": "8b",
+      "display_name": "Pension Plan Type (DB/DC)",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "pension_feature_codes",
+      "line_code": "8c",
+      "display_name": "Pension Feature Codes",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "welfare_plan_types",
+      "line_code": "8d",
+      "display_name": "Welfare Benefit Types",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "funding_arrangement",
+      "line_code": "9a",
+      "display_name": "Funding Arrangement",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "benefit_arrangement",
+      "line_code": "9b",
+      "display_name": "Benefit Arrangement",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "schedule_attachments",
+      "line_code": "10",
+      "display_name": "Attached Schedules",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "iqpa_name",
+      "line_code": "11a",
+      "display_name": "IQPA Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "iqpa_ein",
+      "line_code": "11b",
+      "display_name": "IQPA EIN",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "iqpa_phone",
+      "line_code": "11c",
+      "display_name": "IQPA Telephone",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "actuary_name",
+      "line_code": "12a",
+      "display_name": "Enrolled Actuary Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "actuary_number",
+      "line_code": "12b",
+      "display_name": "Enrolled Actuary Number",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part III - Plan Characteristics"
+    },
+    {
+      "field_name": "noninterest_cash_boy",
+      "line_code": "H-1a(1)(a)",
+      "display_name": "Non-interest Bearing Cash (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "noninterest_cash_eoy",
+      "line_code": "H-1a(1)(b)",
+      "display_name": "Non-interest Bearing Cash (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "employer_securities_boy",
+      "line_code": "H-1b(1)(a)",
+      "display_name": "Employer Securities (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "employer_securities_eoy",
+      "line_code": "H-1b(1)(b)",
+      "display_name": "Employer Securities (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "employer_real_property_boy",
+      "line_code": "H-1b(2)(a)",
+      "display_name": "Employer Real Property (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "employer_real_property_eoy",
+      "line_code": "H-1b(2)(b)",
+      "display_name": "Employer Real Property (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "interest_bearing_cash_boy",
+      "line_code": "H-1c(1)(a)",
+      "display_name": "Interest-Bearing Cash (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "interest_bearing_cash_eoy",
+      "line_code": "H-1c(1)(b)",
+      "display_name": "Interest-Bearing Cash (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "us_govt_securities_boy",
+      "line_code": "H-1c(2)(a)",
+      "display_name": "US Government Securities (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "us_govt_securities_eoy",
+      "line_code": "H-1c(2)(b)",
+      "display_name": "US Government Securities (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "corporate_debt_boy",
+      "line_code": "H-1c(3)(a)",
+      "display_name": "Corporate Debt Instruments (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "corporate_debt_eoy",
+      "line_code": "H-1c(3)(b)",
+      "display_name": "Corporate Debt Instruments (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "corporate_stock_boy",
+      "line_code": "H-1c(4)(a)",
+      "display_name": "Corporate Stock (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "corporate_stock_eoy",
+      "line_code": "H-1c(4)(b)",
+      "display_name": "Corporate Stock (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "partnership_jv_boy",
+      "line_code": "H-1c(5)(a)",
+      "display_name": "Partnership/JV Interests (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "partnership_jv_eoy",
+      "line_code": "H-1c(5)(b)",
+      "display_name": "Partnership/JV Interests (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "real_estate_boy",
+      "line_code": "H-1c(6)(a)",
+      "display_name": "Real Estate (non-employer) (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "real_estate_eoy",
+      "line_code": "H-1c(6)(b)",
+      "display_name": "Real Estate (non-employer) (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "loans_participants_boy",
+      "line_code": "H-1c(7)(a)",
+      "display_name": "Loans to Participants (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "loans_participants_eoy",
+      "line_code": "H-1c(7)(b)",
+      "display_name": "Loans to Participants (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "buildings_boy",
+      "line_code": "H-1c(8)(a)",
+      "display_name": "Buildings/Depreciable Property (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "buildings_eoy",
+      "line_code": "H-1c(8)(b)",
+      "display_name": "Buildings/Depreciable Property (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "other_assets_boy",
+      "line_code": "H-1c(9)(a)",
+      "display_name": "Other Assets (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "other_assets_eoy",
+      "line_code": "H-1c(9)(b)",
+      "display_name": "Other Assets (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Assets"
     },
     {
       "field_name": "total_assets_boy",
-      "display_name": "Total Assets - Beginning of Year (Line 1a)",
+      "line_code": "H-1d(a)",
+      "display_name": "Total Assets (BOY)",
       "data_type": "currency",
       "required": true,
       "extraction_method": "regex",
-      "regex_pattern": "(?:Total\\s+assets\\s+(?:at\\s+)?beginning\\s+(?:of\\s+)?(?:plan\\s+)?year|1a[.)]?\\s+Total\\s+assets)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
-      "section": "Part III - Financial Information"
+      "regex_pattern": "Total\\s+assets\\s+(?:at\\s+)?beginning[^\\d]*\\$?([\\d,]+)",
+      "section": "Schedule H - Assets"
     },
     {
       "field_name": "total_assets_eoy",
-      "display_name": "Total Assets - End of Year (Line 1b)",
+      "line_code": "H-1d(b)",
+      "display_name": "Total Assets (EOY)",
       "data_type": "currency",
       "required": true,
       "extraction_method": "regex",
-      "regex_pattern": "(?:Total\\s+assets\\s+(?:at\\s+)?end\\s+(?:of\\s+)?(?:plan\\s+)?year|1b[.)]?\\s+Total\\s+assets)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
-      "section": "Part III - Financial Information"
+      "regex_pattern": "Total\\s+assets\\s+(?:at\\s+)?end[^\\d]*\\$?([\\d,]+)",
+      "section": "Schedule H - Assets"
+    },
+    {
+      "field_name": "benefit_claims_payable_boy",
+      "line_code": "H-2a(a)",
+      "display_name": "Benefit Claims Payable (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Liabilities"
+    },
+    {
+      "field_name": "benefit_claims_payable_eoy",
+      "line_code": "H-2a(b)",
+      "display_name": "Benefit Claims Payable (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Liabilities"
+    },
+    {
+      "field_name": "operating_payables_boy",
+      "line_code": "H-2b(a)",
+      "display_name": "Operating Payables (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Liabilities"
+    },
+    {
+      "field_name": "operating_payables_eoy",
+      "line_code": "H-2b(b)",
+      "display_name": "Operating Payables (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Liabilities"
+    },
+    {
+      "field_name": "acquisition_debt_boy",
+      "line_code": "H-2c(a)",
+      "display_name": "Acquisition Indebtedness (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Liabilities"
+    },
+    {
+      "field_name": "acquisition_debt_eoy",
+      "line_code": "H-2c(b)",
+      "display_name": "Acquisition Indebtedness (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Liabilities"
+    },
+    {
+      "field_name": "other_liabilities_boy",
+      "line_code": "H-2d(a)",
+      "display_name": "Other Liabilities (BOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Liabilities"
+    },
+    {
+      "field_name": "other_liabilities_eoy",
+      "line_code": "H-2d(b)",
+      "display_name": "Other Liabilities (EOY)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Liabilities"
     },
     {
       "field_name": "total_liabilities_boy",
-      "display_name": "Total Liabilities - Beginning of Year (Line 2a)",
+      "line_code": "H-2e(a)",
+      "display_name": "Total Liabilities (BOY)",
       "data_type": "currency",
       "required": false,
       "extraction_method": "regex",
-      "regex_pattern": "(?:Total\\s+liabilities\\s+(?:at\\s+)?beginning\\s+(?:of\\s+)?(?:plan\\s+)?year|2a[.)]?\\s+Total\\s+liabilities)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
-      "section": "Part III - Financial Information"
+      "regex_pattern": "Total\\s+liabilities\\s+(?:at\\s+)?beginning[^\\d]*\\$?([\\d,]+)",
+      "section": "Schedule H - Liabilities"
     },
     {
       "field_name": "total_liabilities_eoy",
-      "display_name": "Total Liabilities - End of Year (Line 2b)",
+      "line_code": "H-2e(b)",
+      "display_name": "Total Liabilities (EOY)",
       "data_type": "currency",
       "required": false,
       "extraction_method": "regex",
-      "regex_pattern": "(?:Total\\s+liabilities\\s+(?:at\\s+)?end\\s+(?:of\\s+)?(?:plan\\s+)?year|2b[.)]?\\s+Total\\s+liabilities)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
-      "section": "Part III - Financial Information"
+      "regex_pattern": "Total\\s+liabilities\\s+(?:at\\s+)?end[^\\d]*\\$?([\\d,]+)",
+      "section": "Schedule H - Liabilities"
     },
     {
       "field_name": "net_assets_boy",
-      "display_name": "Net Assets - Beginning of Year (Line 3a)",
+      "line_code": "H-3(a)",
+      "display_name": "Net Assets (BOY)",
       "data_type": "currency",
       "required": false,
       "extraction_method": "regex",
-      "regex_pattern": "(?:Net\\s+assets\\s+(?:at\\s+)?beginning\\s+(?:of\\s+)?(?:plan\\s+)?year|3a[.)]?\\s+Net\\s+assets)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
-      "section": "Part III - Financial Information"
+      "regex_pattern": "Net\\s+assets\\s+(?:at\\s+)?beginning[^\\d]*\\$?([\\d,]+)",
+      "section": "Schedule H - Net Assets"
     },
     {
       "field_name": "net_assets_eoy",
-      "display_name": "Net Assets - End of Year (Line 3b)",
+      "line_code": "H-3(b)",
+      "display_name": "Net Assets (EOY)",
       "data_type": "currency",
       "required": true,
       "extraction_method": "regex",
-      "regex_pattern": "(?:Net\\s+assets\\s+(?:at\\s+)?end\\s+(?:of\\s+)?(?:plan\\s+)?year|3b[.)]?\\s+Net\\s+assets)[:\\s]*\\$?([\\d,]+(?:\\.\\d{2})?)",
-      "section": "Part III - Financial Information"
+      "regex_pattern": "Net\\s+assets\\s+(?:at\\s+)?end[^\\d]*\\$?([\\d,]+)",
+      "section": "Schedule H - Net Assets"
+    },
+    {
+      "field_name": "employer_contributions",
+      "line_code": "H-4a",
+      "display_name": "Employer Contributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "Employer\\s+contributions?[:\\s]*\\$?([\\d,]+)",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "participant_contributions",
+      "line_code": "H-4b",
+      "display_name": "Participant Contributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "regex_pattern": "Participant\\s+contributions?[:\\s]*\\$?([\\d,]+)",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "other_contributions",
+      "line_code": "H-4c",
+      "display_name": "Other Contributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "total_contributions",
+      "line_code": "H-4d",
+      "display_name": "Total Contributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "noncash_contributions",
+      "line_code": "H-4e",
+      "display_name": "Noncash Contributions (included in 4d)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "interest_income",
+      "line_code": "H-4f",
+      "display_name": "Interest Income",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "dividends",
+      "line_code": "H-4g",
+      "display_name": "Dividends",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "rents",
+      "line_code": "H-4h",
+      "display_name": "Rents",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "net_gain_sale",
+      "line_code": "H-4i",
+      "display_name": "Net Gain/(Loss) on Sale of Assets",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "unrealized_appreciation",
+      "line_code": "H-4j",
+      "display_name": "Unrealized Appreciation/(Depreciation)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "other_income",
+      "line_code": "H-4k",
+      "display_name": "Other Income",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "total_income",
+      "line_code": "H-4l",
+      "display_name": "Total Income",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Income"
+    },
+    {
+      "field_name": "benefits_paid_directly",
+      "line_code": "H-5a",
+      "display_name": "Benefits Paid Directly to Participants",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Expenses"
+    },
+    {
+      "field_name": "benefits_paid_contract",
+      "line_code": "H-5b",
+      "display_name": "Benefits Paid via Insurance Carrier",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Expenses"
+    },
+    {
+      "field_name": "deemed_distributions",
+      "line_code": "H-5c",
+      "display_name": "Deemed Distributions of Participant Loans",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Expenses"
+    },
+    {
+      "field_name": "total_distributions",
+      "line_code": "H-5d",
+      "display_name": "Total Benefit Distributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Expenses"
+    },
+    {
+      "field_name": "corrective_distributions",
+      "line_code": "H-5e",
+      "display_name": "Corrective Distributions",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Expenses"
+    },
+    {
+      "field_name": "admin_expenses",
+      "line_code": "H-5f",
+      "display_name": "Administrative Expenses",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Expenses"
+    },
+    {
+      "field_name": "total_expenses",
+      "line_code": "H-5g",
+      "display_name": "Total Expenses",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Expenses"
+    },
+    {
+      "field_name": "net_income",
+      "line_code": "H-6",
+      "display_name": "Net Income/(Loss)",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Net Income"
+    },
+    {
+      "field_name": "transfers_in",
+      "line_code": "H-7a",
+      "display_name": "Transfers In",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Transfers"
+    },
+    {
+      "field_name": "transfers_out",
+      "line_code": "H-7b",
+      "display_name": "Transfers Out",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Schedule H - Transfers"
+    },
+    {
+      "field_name": "failed_contribution_transmittal",
+      "line_code": "10a",
+      "display_name": "Failed to Transmit Participant Contributions",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "failed_contribution_amount",
+      "line_code": "10a",
+      "display_name": "Failed Contribution Amount",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "nonexempt_transactions",
+      "line_code": "10b",
+      "display_name": "Nonexempt Party-in-Interest Transactions",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "nonexempt_transaction_amount",
+      "line_code": "10b",
+      "display_name": "Nonexempt Transaction Amount",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "fidelity_bond_coverage",
+      "line_code": "10c",
+      "display_name": "Covered by Fidelity Bond",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "fidelity_bond_amount",
+      "line_code": "10c",
+      "display_name": "Fidelity Bond Amount",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "loss_from_fraud",
+      "line_code": "10d",
+      "display_name": "Loss from Fraud/Dishonesty",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "loss_amount",
+      "line_code": "10d",
+      "display_name": "Fraud Loss Amount",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "broker_fees",
+      "line_code": "10e",
+      "display_name": "Broker Fees Paid",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "failed_minimum_funding",
+      "line_code": "10f",
+      "display_name": "Failed to Meet Minimum Funding",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "participant_loans",
+      "line_code": "10g",
+      "display_name": "Participant Loans",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "loan_amount",
+      "line_code": "10g",
+      "display_name": "Total Participant Loan Amount",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "loans_in_default",
+      "line_code": "10g",
+      "display_name": "Loans in Default",
+      "data_type": "currency",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "leased_employees",
+      "line_code": "10h",
+      "display_name": "Leased Employees Participating",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "plan_terminated",
+      "line_code": "10i",
+      "display_name": "Plan Terminated During Year",
+      "data_type": "boolean",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "resolution_date",
+      "line_code": "10j",
+      "display_name": "Plan Termination Resolution Date",
+      "data_type": "date",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part V - Compliance Questions"
+    },
+    {
+      "field_name": "admin_signature_date",
+      "line_code": "-",
+      "display_name": "Administrator Signature Date",
+      "data_type": "date",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part VI - Signatures"
+    },
+    {
+      "field_name": "admin_signer_name",
+      "line_code": "-",
+      "display_name": "Administrator Signer Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part VI - Signatures"
+    },
+    {
+      "field_name": "sponsor_signature_date",
+      "line_code": "-",
+      "display_name": "Sponsor Signature Date",
+      "data_type": "date",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part VI - Signatures"
+    },
+    {
+      "field_name": "sponsor_signer_name",
+      "line_code": "-",
+      "display_name": "Sponsor Signer Name",
+      "data_type": "string",
+      "required": false,
+      "extraction_method": "regex",
+      "section": "Part VI - Signatures"
     }
   ],
   "output_format": {
-    "csv_headers": [
-      "plan_name",
-      "plan_number",
-      "ein",
-      "plan_year_begin",
-      "plan_year_end",
-      "sponsor_name",
-      "sponsor_address",
-      "sponsor_phone",
-      "administrator_name",
-      "administrator_ein",
-      "plan_type",
-      "total_participants_boy",
-      "total_participants_eoy",
-      "active_participants",
-      "retired_participants",
-      "deceased_participants",
-      "total_assets_boy",
-      "total_assets_eoy",
-      "total_liabilities_boy",
-      "total_liabilities_eoy",
-      "net_assets_boy",
-      "net_assets_eoy"
-    ],
-    "date_format": "MM/DD/YYYY"
+    "date_format": "MM/DD/YYYY",
+    "include_line_codes": true
   }
 }

@@ -34,6 +34,11 @@ class TestForm5500Integration:
         with open(sample_path, 'r') as f:
             return f.read()
 
+    def _get_value(self, results, field_name):
+        """Helper to get value by field name from vertical format DataFrame."""
+        row = results[results['field_name'] == field_name]
+        return row['value'].iloc[0] if len(row) > 0 else None
+
     def test_form_5500_extracts_plan_name(self, extractor, sample_text):
         """Test that plan name is extracted correctly."""
         with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as f:
@@ -43,7 +48,8 @@ class TestForm5500Integration:
         try:
             with patch.object(extractor, '_extract_pdf_text', return_value=sample_text):
                 results = extractor.extract(pdf_path, template='form-5500')
-                assert 'Midwest Manufacturing' in results['plan_name'].iloc[0]
+                plan_name = self._get_value(results, 'plan_name')
+                assert plan_name is not None and 'Midwest Manufacturing' in plan_name
         finally:
             os.unlink(pdf_path)
 
@@ -56,7 +62,7 @@ class TestForm5500Integration:
         try:
             with patch.object(extractor, '_extract_pdf_text', return_value=sample_text):
                 results = extractor.extract(pdf_path, template='form-5500')
-                assert results['ein'].iloc[0] == '36-1234567'
+                assert self._get_value(results, 'ein') == '36-1234567'
         finally:
             os.unlink(pdf_path)
 
@@ -69,8 +75,8 @@ class TestForm5500Integration:
         try:
             with patch.object(extractor, '_extract_pdf_text', return_value=sample_text):
                 results = extractor.extract(pdf_path, template='form-5500')
-                assert results['total_participants_boy'].iloc[0] == 487
-                assert results['total_participants_eoy'].iloc[0] == 512
+                assert self._get_value(results, 'total_participants_boy') == 487
+                assert self._get_value(results, 'total_participants_eoy') == 512
         finally:
             os.unlink(pdf_path)
 
@@ -83,9 +89,10 @@ class TestForm5500Integration:
         try:
             with patch.object(extractor, '_extract_pdf_text', return_value=sample_text):
                 results = extractor.extract(pdf_path, template='form-5500')
-                assert results['total_assets_boy'].iloc[0] == 28620000.0
-                assert results['total_assets_eoy'].iloc[0] == 31444000.0
-                assert results['net_assets_eoy'].iloc[0] == 31426000.0
+                # Currency values are formatted in vertical output
+                assert self._get_value(results, 'total_assets_boy') == '$28,620,000'
+                assert self._get_value(results, 'total_assets_eoy') == '$31,444,000'
+                assert self._get_value(results, 'net_assets_eoy') == '$31,426,000'
         finally:
             os.unlink(pdf_path)
 
@@ -261,8 +268,11 @@ class TestFullExtractionPipeline:
                 csv_path = tmp_path / 'output.csv'
                 results.to_csv(csv_path, index=False)
                 loaded = pd.read_csv(csv_path)
-                assert loaded['ein'].iloc[0] == '36-1234567'
-                assert loaded['total_participants_eoy'].iloc[0] == 512
+                # Vertical format: find values by field_name column
+                ein_row = loaded[loaded['field_name'] == 'ein']
+                participants_row = loaded[loaded['field_name'] == 'total_participants_eoy']
+                assert ein_row['value'].iloc[0] == '36-1234567'
+                assert int(participants_row['value'].iloc[0]) == 512
         finally:
             os.unlink(pdf_path)
 
