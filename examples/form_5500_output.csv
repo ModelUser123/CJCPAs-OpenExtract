@@ -18,7 +18,7 @@ I,secure_act_retroactive,SECURE Act Section 201 Retroactive Plan,
 1c,effective_date,Effective Date of Plan,
 2a,sponsor_name,Plan Sponsor Name,ABC Company Inc
 2b,ein,Employer Identification Number (EIN),45-6789012
-2c,sponsor_phone,Sponsor Telephone Number,
+2c,sponsor_phone,Sponsor Telephone Number,(617) 555-1234 3
 2d,business_code,Business Code (NAICS),
 2e,sponsor_address,Sponsor Street Address,Address: 500 Corporate Drive
 2e,sponsor_city,Sponsor City,
