@@ -536,6 +536,89 @@ class Extractor:
         if bond_match:
             extracted['fidelity_bond_amount'] = parse_currency(bond_match.group(1))
 
+        # ============== SCHEDULE H - FINANCIAL INFORMATION (Full 5500) ==============
+        # Schedule H uses different line codes than 5500-SF
+
+        # Total Assets (Schedule H line 1f) - Pattern: "Total assets" followed by two numbers
+        assets_match = re.search(
+            r'Total assets[^\d]*(\d{1,3}(?:,?\d{3})*)\s+(\d{1,3}(?:,?\d{3})*)',
+            full_text, re.IGNORECASE
+        )
+        if assets_match:
+            # First number is BOY, second is EOY
+            if not extracted.get('total_assets_boy'):
+                extracted['total_assets_boy'] = parse_currency(assets_match.group(1))
+            if not extracted.get('total_assets_eoy'):
+                extracted['total_assets_eoy'] = parse_currency(assets_match.group(2))
+
+        # Total Liabilities (Schedule H line 1k)
+        liab_match = re.search(
+            r'Total liabilities[^\d]*(\d{1,3}(?:,?\d{3})*)\s+(\d{1,3}(?:,?\d{3})*)',
+            full_text, re.IGNORECASE
+        )
+        if liab_match:
+            if not extracted.get('total_liabilities_boy'):
+                extracted['total_liabilities_boy'] = parse_currency(liab_match.group(1))
+            if not extracted.get('total_liabilities_eoy'):
+                extracted['total_liabilities_eoy'] = parse_currency(liab_match.group(2))
+
+        # Net Assets (Schedule H line 1l)
+        net_match = re.search(
+            r'Net assets[^\d]*(\d{1,3}(?:,?\d{3})*)\s+(\d{1,3}(?:,?\d{3})*)',
+            full_text, re.IGNORECASE
+        )
+        if net_match:
+            if not extracted.get('net_assets_boy'):
+                extracted['net_assets_boy'] = parse_currency(net_match.group(1))
+            if not extracted.get('net_assets_eoy'):
+                extracted['net_assets_eoy'] = parse_currency(net_match.group(2))
+
+        # Employer contributions (Schedule H) - look in statement text
+        emp_contrib_match = re.search(
+            r'Employer contributions\s+(\d{1,3}(?:,?\d{3})*)\s+(\d{1,3}(?:,?\d{3})*)',
+            full_text, re.IGNORECASE
+        )
+        if emp_contrib_match and not extracted.get('employer_contributions'):
+            # Second number is current year
+            extracted['employer_contributions'] = parse_currency(emp_contrib_match.group(1))
+
+        # Participant contributions
+        part_contrib_match = re.search(
+            r'Participant contributions\s+(\d{1,3}(?:,?\d{3})*)\s+(\d{1,3}(?:,?\d{3})*)',
+            full_text, re.IGNORECASE
+        )
+        if part_contrib_match and not extracted.get('participant_contributions'):
+            extracted['participant_contributions'] = parse_currency(part_contrib_match.group(1))
+
+        # Total participants from Schedule H or statements
+        # Look for patterns like "5 30" or participant count in text
+        part_boy_match = re.search(r'beginning of the plan year\s+5\s+(\d+)', full_text, re.IGNORECASE)
+        if part_boy_match and not extracted.get('total_participants_boy'):
+            extracted['total_participants_boy'] = int(part_boy_match.group(1))
+
+        part_eoy_match = re.search(r'end of the plan year\s+6\s+(\d+)', full_text, re.IGNORECASE)
+        if part_eoy_match and not extracted.get('total_participants_eoy'):
+            extracted['total_participants_eoy'] = int(part_eoy_match.group(1))
+
+        # Alternative participant count pattern
+        part_match = re.search(r'participants.*?beginning.*?(\d+).*?end.*?(\d+)', full_text, re.IGNORECASE | re.DOTALL)
+        if part_match:
+            if not extracted.get('total_participants_boy'):
+                extracted['total_participants_boy'] = int(part_match.group(1))
+            if not extracted.get('total_participants_eoy'):
+                extracted['total_participants_eoy'] = int(part_match.group(2))
+
+        # Sponsor name from Schedule H header
+        sponsor_match = re.search(
+            r"Plan sponsor's name.*?\n([A-Z0-9][A-Z0-9\s,\.]+(?:LLC|INC|CORP|LLP|LP)?)",
+            full_text, re.IGNORECASE
+        )
+        if sponsor_match and not extracted.get('sponsor_name'):
+            sponsor = sponsor_match.group(1).strip()
+            # Clean up any form text that got captured
+            if len(sponsor) < 100 and 'Date' not in sponsor:
+                extracted['sponsor_name'] = sponsor
+
         return extracted
 
     def _decode_dol_financial_value(self, text: str) -> Optional[float]:
