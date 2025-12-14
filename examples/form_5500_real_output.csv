@@ -1,0 +1,139 @@
+line_code,field_name,display_name,value
+-,plan_year_begin,Plan Year Beginning Date,01/01/2024
+-,plan_year_end,Plan Year Ending Date,12/31/2024
+A,plan_type,Plan Type,Single-employer
+B,is_first_return,First Return/Report,True
+B,is_final_return,Final Return/Report,True
+B,is_amended_return,Amended Return/Report,True
+B,is_short_plan_year,Short Plan Year,True
+C,filing_extension,Filing Extension Type,Form 5558
+D,collectively_bargained,Collectively-Bargained Plan,
+E,multiemployer_plan,Multiemployer Plan,
+F,master_trust,Part of Master Trust,
+G,common_collective_trust,CCT/Pooled Separate Account,
+H,dfe_investment,Direct Filing Entity Investment,
+I,secure_act_retroactive,SECURE Act Section 201 Retroactive Plan,
+1a,plan_name,Name of Plan,"1 SOURCE BUSINESS SOLUTIONS 401(K) PLAN
+
+1b Three-digit plan
+number"
+1b,plan_number,Three-Digit Plan Number (PN),333
+1c,effective_date,Effective Date of Plan,01/01/2013
+2a,sponsor_name,Plan Sponsor Name,Date Enter name of individual signing as employer or plan sponsor
+2b,ein,Employer Identification Number (EIN),27-3793520
+2c,sponsor_phone,Sponsor Telephone Number,801-352-2333
+2d,business_code,Business Code (NAICS),813000
+2e,sponsor_address,Sponsor Street Address,(include room
+2e,sponsor_city,Sponsor City,"S COMMERCE PARK DRIVE
+MIDVALE"
+2e,sponsor_state,Sponsor State,UT
+2e,sponsor_zip,Sponsor ZIP Code,84047
+2e,sponsor_country,Sponsor Country (if foreign),
+3a,admin_same_as_sponsor,Administrator Same as Sponsor,True
+3a,admin_name,Administrator Name,
+3b,admin_ein,Administrator EIN,
+3c,admin_phone,Administrator Telephone Number,
+3d,admin_address,Administrator Address,
+4a,prior_sponsor_name,Prior Sponsor Name (if changed),
+4b,prior_ein,Prior EIN (if changed),
+4c,prior_plan_name,Prior Plan Name (if changed),
+4d,prior_plan_number,Prior Plan Number (if changed),
+5,total_participants_boy,Total Participants at Beginning of Year,30
+6,total_participants_eoy,Total Participants at End of Year,16
+7a,active_participants,Active Participants,
+7b,retired_separated_participants,Retired/Separated Participants Receiving Benefits,
+7c,other_participants,"Other Participants (Separated, entitled to future benefits)",
+7d,deceased_participants,Deceased Participants with Beneficiaries,
+7e,total_all_categories,Total All Categories (7a+7b+7c+7d),
+8a,plan_type_code,Type of Plan (Pension/Welfare),
+8b,pension_plan_type,Pension Plan Type (DB/DC),
+8c,pension_feature_codes,Pension Feature Codes,"2E, 2F, 2K, 2T, 3D, 2B"
+8d,welfare_plan_types,Welfare Benefit Types,
+9a,funding_arrangement,Funding Arrangement,
+9b,benefit_arrangement,Benefit Arrangement,
+10,schedule_attachments,Attached Schedules,
+11a,iqpa_name,IQPA Name,
+11b,iqpa_ein,IQPA EIN,
+11c,iqpa_phone,IQPA Telephone,
+12a,actuary_name,Enrolled Actuary Name,
+12b,actuary_number,Enrolled Actuary Number,
+H-1a(1)(a),noninterest_cash_boy,Non-interest Bearing Cash (BOY),
+H-1a(1)(b),noninterest_cash_eoy,Non-interest Bearing Cash (EOY),
+H-1b(1)(a),employer_securities_boy,Employer Securities (BOY),
+H-1b(1)(b),employer_securities_eoy,Employer Securities (EOY),
+H-1b(2)(a),employer_real_property_boy,Employer Real Property (BOY),
+H-1b(2)(b),employer_real_property_eoy,Employer Real Property (EOY),
+H-1c(1)(a),interest_bearing_cash_boy,Interest-Bearing Cash (BOY),
+H-1c(1)(b),interest_bearing_cash_eoy,Interest-Bearing Cash (EOY),
+H-1c(2)(a),us_govt_securities_boy,US Government Securities (BOY),
+H-1c(2)(b),us_govt_securities_eoy,US Government Securities (EOY),
+H-1c(3)(a),corporate_debt_boy,Corporate Debt Instruments (BOY),
+H-1c(3)(b),corporate_debt_eoy,Corporate Debt Instruments (EOY),
+H-1c(4)(a),corporate_stock_boy,Corporate Stock (BOY),
+H-1c(4)(b),corporate_stock_eoy,Corporate Stock (EOY),
+H-1c(5)(a),partnership_jv_boy,Partnership/JV Interests (BOY),
+H-1c(5)(b),partnership_jv_eoy,Partnership/JV Interests (EOY),
+H-1c(6)(a),real_estate_boy,Real Estate (non-employer) (BOY),
+H-1c(6)(b),real_estate_eoy,Real Estate (non-employer) (EOY),
+H-1c(7)(a),loans_participants_boy,Loans to Participants (BOY),
+H-1c(7)(b),loans_participants_eoy,Loans to Participants (EOY),
+H-1c(8)(a),buildings_boy,Buildings/Depreciable Property (BOY),
+H-1c(8)(b),buildings_eoy,Buildings/Depreciable Property (EOY),
+H-1c(9)(a),other_assets_boy,Other Assets (BOY),
+H-1c(9)(b),other_assets_eoy,Other Assets (EOY),
+H-1d(a),total_assets_boy,Total Assets (BOY),
+H-1d(b),total_assets_eoy,Total Assets (EOY),
+H-2a(a),benefit_claims_payable_boy,Benefit Claims Payable (BOY),
+H-2a(b),benefit_claims_payable_eoy,Benefit Claims Payable (EOY),
+H-2b(a),operating_payables_boy,Operating Payables (BOY),
+H-2b(b),operating_payables_eoy,Operating Payables (EOY),
+H-2c(a),acquisition_debt_boy,Acquisition Indebtedness (BOY),
+H-2c(b),acquisition_debt_eoy,Acquisition Indebtedness (EOY),
+H-2d(a),other_liabilities_boy,Other Liabilities (BOY),
+H-2d(b),other_liabilities_eoy,Other Liabilities (EOY),
+H-2e(a),total_liabilities_boy,Total Liabilities (BOY),
+H-2e(b),total_liabilities_eoy,Total Liabilities (EOY),
+H-3(a),net_assets_boy,Net Assets (BOY),
+H-3(b),net_assets_eoy,Net Assets (EOY),
+H-4a,employer_contributions,Employer Contributions,"$272,609"
+H-4b,participant_contributions,Participant Contributions,$13
+H-4c,other_contributions,Other Contributions,
+H-4d,total_contributions,Total Contributions,
+H-4e,noncash_contributions,Noncash Contributions (included in 4d),
+H-4f,interest_income,Interest Income,
+H-4g,dividends,Dividends,
+H-4h,rents,Rents,
+H-4i,net_gain_sale,Net Gain/(Loss) on Sale of Assets,
+H-4j,unrealized_appreciation,Unrealized Appreciation/(Depreciation),
+H-4k,other_income,Other Income,
+H-4l,total_income,Total Income,
+H-5a,benefits_paid_directly,Benefits Paid Directly to Participants,
+H-5b,benefits_paid_contract,Benefits Paid via Insurance Carrier,
+H-5c,deemed_distributions,Deemed Distributions of Participant Loans,
+H-5d,total_distributions,Total Benefit Distributions,
+H-5e,corrective_distributions,Corrective Distributions,
+H-5f,admin_expenses,Administrative Expenses,
+H-5g,total_expenses,Total Expenses,
+H-6,net_income,Net Income/(Loss),
+H-7a,transfers_in,Transfers In,
+H-7b,transfers_out,Transfers Out,
+10a,failed_contribution_transmittal,Failed to Transmit Participant Contributions,No
+10a,failed_contribution_amount,Failed Contribution Amount,
+10b,nonexempt_transactions,Nonexempt Party-in-Interest Transactions,
+10b,nonexempt_transaction_amount,Nonexempt Transaction Amount,
+10c,fidelity_bond_coverage,Covered by Fidelity Bond,Yes
+10c,fidelity_bond_amount,Fidelity Bond Amount,$4
+10d,loss_from_fraud,Loss from Fraud/Dishonesty,No
+10d,loss_amount,Fraud Loss Amount,
+10e,broker_fees,Broker Fees Paid,
+10f,failed_minimum_funding,Failed to Meet Minimum Funding,
+10g,participant_loans,Participant Loans,No
+10g,loan_amount,Total Participant Loan Amount,
+10g,loans_in_default,Loans in Default,
+10h,leased_employees,Leased Employees Participating,
+10i,plan_terminated,Plan Terminated During Year,
+10j,resolution_date,Plan Termination Resolution Date,
+-,admin_signature_date,Administrator Signature Date,
+-,admin_signer_name,Administrator Signer Name,
+-,sponsor_signature_date,Sponsor Signature Date,
+-,sponsor_signer_name,Sponsor Signer Name,
